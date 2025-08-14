@@ -1,5 +1,15 @@
 # autonomous_navigation_ws
 
+Autonomous Navigation of Mobile Robot with 2D LiDAR and IMU.
+
+- [Localization] Monte Carlo Localization
+- [Local Planner] Model Predictive Path Integral Control
+
+# Tested Environment
+
+- Mac M1
+- ROS2 Humble
+
 # Dependencies
 
 rviz

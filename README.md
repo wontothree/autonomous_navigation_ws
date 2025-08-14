@@ -1,2 +1,24 @@
 # autonomous_navigation_ws
-Autonomous Navigation Ros2 Humble-Based Workspace for Indoor Mobile Robot System - Localization, Decision-Making, Local Planning by SOTA
+
+# Dependencies
+
+rviz
+
+```bash
+apt-get update
+apt-get install -y tigervnc-standalone-server tigervnc-common novnc websockify
+websockify --web=/usr/share/novnc/ 8080 localhost:5901
+
+source /opt/ros/humble/setup.bash
+. install/local_setup.bash
+rviz2
+```
+
+http://localhost:8080/vnc.html
+
+# Getting Started
+
+```bash
+source /opt/ros/humble/setup.bash
+. install/local_setup.bash
+```

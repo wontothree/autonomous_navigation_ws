@@ -5,20 +5,32 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# CMake에서 컴파일러가 헤더 파일(.h)을 찾을 경로를 지정한다.
+include_directories(include/)
+
+# 의존성을 추가한다.
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+
+# src 안에 있는 모든 실행 파일을 추가한다. -> 실행 파일을 만든다.
+add_executable(monte_carlo_localization_node 
+  src/monte_carlo_localization_node.cpp
+  src/monte_carlo_localization_ros.cpp
+)
+
+# 특정 실행 파일이 의존하는 의존성을 명시한다.
+ament_target_dependencies(monte_carlo_localization_node
+  rclcpp
+)
+
+# 실행 파일을 설치 경로에 복사한다.
+install(TARGETS monte_carlo_localization_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
   set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()

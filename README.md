@@ -1,17 +1,25 @@
-# autonomous_navigation_ws
+<div align="center">
 
-Autonomous Navigation of Mobile Robot with 2D LiDAR and IMU.
+  # Autonomous Navigation ROS2 Humble-Based Workspace
+  
+  Autonomous Navigation of Indoor Mobile Robot with 2D LiDAR and IMU
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Node.js](https://img.shields.io/badge/Node.js-22.16.0-green.svg)](https://nodejs.org/)
+  [![Status](https://img.shields.io/badge/Status-Alpha-orange.svg)]()
+  
+</div>
 
-- [Localization] Monte Carlo Localization
-- [Local Planner] Model Predictive Path Integral Control
+--- 
 
-# Tested Environment
+## 🚀 Quick Start
 
-- Mac M1
-- ROS2 Humble
+```bash
+source /opt/ros/humble/setup.bash
+. install/local_setup.bash
+```
 
-# Dependencies
-
+```bash
 rviz
 
 ```bash
@@ -26,9 +34,28 @@ rviz2
 
 http://localhost:8080/vnc.html
 
-# Getting Started
+---
 
-```bash
-source /opt/ros/humble/setup.bash
-. install/local_setup.bash
-```
+## System Requirement
+
+- ROS2 Humble
+
+## Tested Environment
+
+- Mac M1
+
+## 🏗️ Technical Architecture
+
+- [Localization] Monte Carlo Localization
+- [Local Planner] Model Predictive Path Integral Control
+
+---
+
+## 📁 Project Structure
+
+    autonomous_navigation_ws
+    └── src/
+        ├── monte_carlo_localization/             # localization
+        └── mppi_planner/                         # local planner
+
+---

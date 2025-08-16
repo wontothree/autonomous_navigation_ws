@@ -8,9 +8,9 @@
 #include <list>
 #include <numeric>
 
-#include <monte_carlo_localization/histogram.hpp>
+#include <mc_localizer/histogram.hpp>
 
-namespace monte_carlo_localization {
+namespace mc_localizer {
 
 class MAEClassifier {
 private:
@@ -290,6 +290,6 @@ public:
     }
 }; // class MAEClassifier
 
-} // namespace monte_carlo_localization
+} // namespace mc_localizer
 
 #endif // MAE_CLASSIFIER_H

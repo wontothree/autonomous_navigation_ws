@@ -1,9 +1,9 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
-#include <monte_carlo_localization/pose.hpp>
+#include <mc_localizer/pose.hpp>
 
-namespace monte_carlo_localization {
+namespace mc_localizer {
 
 class Particle {
 private:
@@ -33,6 +33,6 @@ public:
     inline void setW(double w) { w_ = w; }
 }; // class Particle
 
-} // namespace monte_carlo_localization
+} // namespace mc_localizer
 
 #endif // PARTICLE_H

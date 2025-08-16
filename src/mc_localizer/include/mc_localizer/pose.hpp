@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-namespace monte_carlo_localization {
+namespace mc_localizer {
 
 class Pose {
 private:
@@ -38,6 +38,6 @@ public:
 
 }; // class Pose
 
-} // namespace monte_carlo_localization
+} // namespace mc_localizer
 
 #endif // POSE_H

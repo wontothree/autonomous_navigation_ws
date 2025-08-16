@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace monte_carlo_localization {
+namespace mc_localizer {
 
 class Histogram {
 private:
@@ -98,6 +98,6 @@ public:
     }
 }; // class Histogram
 
-} // namespace monte_carlo_localization
+} // namespace mc_localizer
 
 #endif // HISTOGRAM_H

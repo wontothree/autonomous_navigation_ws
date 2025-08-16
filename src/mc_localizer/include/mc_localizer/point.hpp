@@ -1,7 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
-namespace monte_carlo_localization {
+namespace mc_localizer {
 
 class Point {
 private:
@@ -27,6 +27,6 @@ public:
 
 }; // class Point
 
-} // namespace monte_carlo_localization
+} // namespace mc_localizer
 
 #endif // POINT_H

@@ -3,8 +3,10 @@
   # Autonomous Navigation Workspace
   
   Autonomous Navigation of Indoor Mobile Robot with 2D LiDAR and IMU
-  
+
   [![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue.svg)](https://docs.ros.org/en/humble/)
+  [![Gazebo](https://img.shields.io/badge/Gazebo-11-orange.svg)](http://gazebosim.org/)
+  [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://isocpp.org/)
 
 </div>
 
@@ -36,22 +38,22 @@ http://localhost:8080/vnc.html
 ## 🏗️ Technical Architecture
 
 - [Localization] Monte Carlo Localization
-- [Local Planner] Model Predictive Path Integral Control
+- [Control] Model Predictive Path Integral Control
 
-### 🌳 Architecture Diagram
+### Architecture Diagram
 
 ```mermaid
 mindmap
   root(autonomous_navigation_ws)
-    (mc_localization)
+    (mc_localizaer)
     (mppi_controller)
 ```
 
-### 📁 Project Structure
+### Project Structure
 
     autonomous_navigation_ws
     └── src/
-        ├── monte_carlo_localization/             # localization
-        └── mppi_controller/                      # local planner
+        ├── mc_localizater/              # localization
+        └── mppi_controller/             # local planner
 
 ---

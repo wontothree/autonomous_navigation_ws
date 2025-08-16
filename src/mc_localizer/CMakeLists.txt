@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(monte_carlo_localization)
+project(mc_localizer)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -13,18 +13,18 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
 # src 안에 있는 모든 실행 파일을 추가한다. -> 실행 파일을 만든다.
-add_executable(monte_carlo_localization_node 
-  src/monte_carlo_localization_node.cpp
-  src/monte_carlo_localization_ros.cpp
+add_executable(mc_localizer_node 
+  src/mc_localizer_node.cpp
+  src/mc_localizer_ros.cpp
 )
 
 # 특정 실행 파일이 의존하는 의존성을 명시한다.
-ament_target_dependencies(monte_carlo_localization_node
+ament_target_dependencies(mc_localizer_node
   rclcpp
 )
 
 # 실행 파일을 설치 경로에 복사한다.
-install(TARGETS monte_carlo_localization_node
+install(TARGETS mc_localizer_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

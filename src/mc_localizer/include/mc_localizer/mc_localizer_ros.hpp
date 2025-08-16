@@ -1,12 +1,12 @@
-#ifndef MONTE_CARLO_LOCALIZATION_ROS_H
-#define MONTE_CARLO_LOCALIZATION_ROS_H
+#ifndef MC_LOCALIZER_ROS_H
+#define MC_LOCALIZER_ROS_H
 
 #include "rclcpp/rclcpp.hpp"
 
-class MonteCarloLocalizationROS : public rclcpp::Node {
+class MCLocalizerRos : public rclcpp::Node {
 public:
-    MonteCarloLocalizationROS();
-    ~MonteCarloLocalizationROS() {};
+    MCLocalizerRos();
+    ~MCLocalizerRos() {};
 
 private:
     const int timer_period = 10;                                  // timer period (ms)
@@ -20,4 +20,4 @@ private:
     void timer_callback();
 };
 
-#endif // MONTE_CARLO_LOCALIZATION_ROS_H
+#endif // MC_LOCALIZER_ROS_H

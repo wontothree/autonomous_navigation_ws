@@ -54,6 +54,6 @@ mindmap
     autonomous_navigation_ws
     └── src/
         ├── mc_localizater/              # localization
-        └── mppi_controller/             # local planner
+        └── mppi_controller/             # control
 
 ---

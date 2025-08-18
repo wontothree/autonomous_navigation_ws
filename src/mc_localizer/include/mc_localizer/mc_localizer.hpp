@@ -4,6 +4,8 @@
 // #include <cmath> // fabs, rand, cos, log, M_PI
 #include <vector> // std::vector
 
+#include "sensor_msgs/msg/laser_scan.hpp"
+
 #include <mc_localizer/pose.hpp>
 #include <mc_localizer/particle.hpp>
 
@@ -18,6 +20,7 @@ private:
     // pose
     double inital_pose_x_, inital_pose_y_, inital_pose_yaw_;
     Pose mc_localizer_pose_;
+    Pose base_link_to_laser_;
 
     // particles
     int particle_num_;
@@ -29,8 +32,17 @@ private:
     bool is_omnidirectional_model;
     std::vector<double> odom_noise_odm_;
 
+    // measurements
+    std::vector<bool> likelihoodShiftedSteps_;
+    sensor_msgs::msg::LaserScan scan_;
+
+    // measurement model
+    int scanStep_;
+
 public:
     void update_particle_by_motion_model(void);
+
+    void calculate_likelihoods_measurement_model(void);
 
 private:
     // util functions

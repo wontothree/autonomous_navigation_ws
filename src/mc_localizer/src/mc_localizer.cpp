@@ -90,4 +90,88 @@ void MCLocalizer::update_particle_by_motion_model(void)
     }
 }
 
+void MCLocalizer::calculate_likelihoods_measurement_model(void)
+{
+    // if (scanMightInvalid_)
+    //     return;
+
+    // if (rejectUnknownScan_ && (measurementModelType_ == 0 || measurementModelType_ == 1))
+    //     rejectUnknownScan();    
+
+    // sensor pose 계산
+    double x0 = base_link_to_laser_.getX();
+    double y0 = base_link_to_laser_.getY();
+    double yaw0 = base_link_to_laser_.getYaw();
+    std::vector<Pose> sensor_poses(particle_num_);
+    for (int i = 0; i < particle_num_; ++i) {
+        double yaw = particles_[i].getYaw();
+        double sensorX = x0 * cos(yaw) - y0 * sin(yaw) + particles_[i].getX();
+        double sensorY = x0 * sin(yaw) - y0 * cos(yaw) + particles_[i].getY();
+        double sensorYaw = yaw0 + yaw;
+        Pose sensorPose(sensorX, sensorY, sensorYaw);
+        sensor_poses[i] = sensorPose;
+        particles_[i].setW(0.0);
+    }
+
+    // measurement linkelihood
+    likelihoodShiftedSteps_.clear();
+    for (int i = 0; i < (int)scan_.ranges.size(); i += scanStep_) {
+        double range = scan_.ranges[i];
+        double rangeAngle = (double)i * scan_.angle_increment + scan_.angle_min;
+        double max;
+        for (int j = 0; j < particle_num_; ++j) {
+            double p;
+            if (measurementModelType_ == 0)
+                p = calculateLikelihoodFieldModel(sensor_poses[j], range, rangeAngle);
+            else if (measurementModelType_ == 1)
+                p = calculateBeamModel(sensor_poses[j], range, rangeAngle);
+            else
+                p = calculateClassConditionalMeasurementModel(sensor_poses[j], rage, rangeAngle);
+
+            double w = particles_[j].getW();
+            w += log(p);
+            particles_[j].setW(w);
+            if (j == 0)
+                max = w;
+            else {
+                if (max < w)
+                    max = w;
+            }
+        }
+
+        // numerical stability
+        if (max < -300.0) {
+            for (int j = 0; j < particlesNum_; ++j) {
+                double w = particles_[j].getW() + 300.0;
+                particles_[j].setW(w);
+            }
+            likelihoodShiftedSteps_.push_back(true);
+        } else {
+            likelihoodShiftedSteps_.push_back(false);
+        }
+    }
+
+    // Weight normalization
+    double sum = 0.0;
+    double max;
+    int maxIdx;
+    for (int i = 0; i < particlesNum_; ++i) {
+        // The log sum is converted to the probability.
+        double w = exp(particles_[i].getW());
+        particles_[i].setW(w);
+        sum += w;
+        if (i == 0) {
+            max = w;
+            maxIdx = i;
+        } else if (max < w) {
+            max = w;
+            maxIdx = i;
+        }
+    }
+    totalLikelihood_ = sum;
+    averageLikelihood_ = sum / (double)particlesNum_;
+    maxLikelihood_ = max;
+    maxLikelihoodParticleIdx_ = maxIdx;
+}
+
 } // namespace mc_localizer

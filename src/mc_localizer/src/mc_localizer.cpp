@@ -90,7 +90,7 @@ void MCLocalizer::update_particle_by_motion_model(void)
     }
 }
 
-void MCLocalizer::calculate_likelihoods_measurement_model(void)
+void MCLocalizer::calculate_likelihoods_by_measurement_model(void)
 {
     // if (scanMightInvalid_)
     //     return;
@@ -172,6 +172,41 @@ void MCLocalizer::calculate_likelihoods_measurement_model(void)
     averageLikelihood_ = sum / (double)particlesNum_;
     maxLikelihood_ = max;
     maxLikelihoodParticleIdx_ = maxIdx;
+}
+
+void calculate_likelihoods_by_decision_model(void)
+{
+    double likelihood_sum = 0.0;
+    double max_likelihood;
+    int max_likelihood_particle_index;
+    for (int i = 0; i < particle_num_; ++i) {
+        Pose particle_pose = particles_[i].getPose();
+        double measurement_likelihood = particle_[i].getW();
+        std::vector<double> residual_errors = getResidualErrors<double>(particle_pose);
+        double decision_likelihood;
+        if (1) { // check
+            double mae = mae_classifier_.getMAE(residual_errors);
+            decision_likelihood = mae_classifier_.calculate_decision_model(mae, &reliabilities_[i]);
+            mae_[i] = mae;
+        }
+
+        double w = measurement_likelihood * decision_likelihood;
+        particles_[i].setW(w);
+        likelihood_sum += w;
+        if (i == 0) {
+            max_likelihood = w;
+            max_likelihood_particle_index = i;
+        } else if (max_likelihood < w) {
+            max_likelihood = w;
+            max_likelihood_particle_index = i
+        }
+    }
+
+    total_likelihood_ = likelihood_sum;
+    average_likelihood_ = likelihood_sum / (double) particles_num_;
+    max_likelihood_ = max_likelihood;
+    max_likelihood_particle_index_ = max_likelihood_particle_index;
+    reliability_ = reliabilities_[max_likelihood_particle_index];
 }
 
 } // namespace mc_localizer

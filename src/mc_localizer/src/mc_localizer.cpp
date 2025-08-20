@@ -26,7 +26,7 @@ MCLocalizer::MCLocalizer()
  * @member 
  * @modifies
  */
-void MCLocalizer::update_particle_by_motion_model(void)
+void MCLocalizer::update_particles_by_motion_model(void)
 {
     // delare and initialize local variables
     double delta_x = delta_x_;
@@ -71,12 +71,12 @@ void MCLocalizer::update_particle_by_motion_model(void)
             double dy = delta_y + nrand(yRandVal);
             double dyaw = delta_yaw + nrand(yawRandVal);
 
-            double yaw = particles_[i].getYaw();
+            double yaw = pose_tracking_particle_set_[i].getYaw();
             double t = yaw + dyaw / 2.0;
-            double x = particles_[i].getX() + dx * cos(t) + dy * cos(t + M_PI / 2.0f);
-            double y = particles_[i].getY() + dx * sin(t) + dy * sin(t + M_PI / 2.0f);;
+            double x = pose_tracking_particle_set_[i].getX() + dx * cos(t) + dy * cos(t + M_PI / 2.0f);
+            double y = pose_tracking_particle_set_[i].getY() + dx * sin(t) + dy * sin(t + M_PI / 2.0f);;
             yaw += dyaw;
-            particles_[i].setPose(x, y, yaw);
+            pose_tracking_particle_set_[i].setPose(x, y, yaw);
 
             // reliability transition model
 
@@ -174,7 +174,7 @@ void MCLocalizer::calculate_likelihoods_by_measurement_model(void)
     maxLikelihoodParticleIdx_ = maxIdx;
 }
 
-void calculate_likelihoods_by_decision_model(void)
+void MCLocalizer::calculate_likelihoods_by_decision_model(void)
 {
     double likelihood_sum = 0.0;
     double max_likelihood;
@@ -207,6 +207,71 @@ void calculate_likelihoods_by_decision_model(void)
     max_likelihood_ = max_likelihood;
     max_likelihood_particle_index_ = max_likelihood_particle_index;
     reliability_ = reliabilities_[max_likelihood_particle_index];
+}
+
+void MCLocalizer::calculate_likelihoods_from_global_localization(void)
+{
+    //
+}
+
+/**
+ * @member pose_tracking_particle_set_, global_localization_particle_set_
+ * @member pose_tracking_particle_num_, global_localization_particle_num_
+ * @member is_global_localization_sampling_enabled, can_use_global_localization_sample
+ * 
+ * @modifies mcl_estimated_pose_
+ */
+void MCLocalizer::estimate_robot_pose(void)
+{
+    // if (scanMightInvalid_)
+    //     return;
+
+    double temp_yaw = mcl_estimated_pose_.getYaw();
+    double x = 0.0, y = 0.0, yaw = 0.0;
+    double sum = 0.0;
+    for (int i = 0; i < pose_tracking_particle_num_; ++i) {
+        double weight = pose_tracking_particle_set_[i].getWeight();
+        x += pose_tracking_particle_set_[i].getX() * weight;
+        y += pose_tracking_particle_set_[i].getY() * weight;
+        
+        double dyaw = temp_yaw - pose_tracking_particle_set_[i].getYaw();
+
+        while (dyaw < - M_PI)
+            dyaw += 2.0 * M_PI;
+        while (dyaw > M_PI)
+            dyaw -= 2.0 * M_PI;
+
+        yaw += dyaw * weight;
+        sum += weight;
+    }
+
+    if (is_global_localization_sampling_enabled && can_use_global_localization_sample) {
+        double x2 = x, y2 = y, yaw2 = yaw;
+        for (int i = 0; i < global_localization_particle_num_; ++i) {
+            double weight = global_localization_particle_set_[i].getWeight();
+            x += global_localization_particle_set_[i].getX() * weight;
+            y += global_localization_particle_set_[i].getY() * weight;
+
+            double dyaw = temp_yaw - global_localization_particle_set_[i].getYaw();
+            while (dyaw < -M_PI)
+                dyaw += 2.0 * M_PI;
+            while (dyaw > M_PI)
+                dyaw -= 2.0 * M_PI;
+
+            yaw += dyaw * weight;
+            sum += weight;
+        }
+        if (sum > 1.0)
+            x = x2, y = y2, yaw = yaw2;
+    }
+
+    yaw = temp_yaw - yaw;
+    mcl_estimated_pose_.setPose(x, y, yaw);
+}
+
+void MCLocalizer::resample_particles(void)
+{
+    //
 }
 
 } // namespace mc_localizer

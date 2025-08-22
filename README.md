@@ -14,24 +14,79 @@
 
 ## 🚀 Quick Start
 
+기타
+
 ```bash
-source /opt/ros/humble/setup.bash
-. install/local_setup.bash
+conda deactivate
+conda remove --name "autonomous_navigation_env" --all
+rm -rf build install log
 ```
 
-rviz
+1. Install ROS Humble
 
 ```bash
-apt-get update
-apt-get install -y tigervnc-standalone-server tigervnc-common novnc websockify
-websockify --web=/usr/share/novnc/ 8080 localhost:5901
+eval "$(/Users/wontothree/miniforge3/bin/conda shell.zsh hook)"
 
-source /opt/ros/humble/setup.bash
-. install/local_setup.bash
+conda create -n "autonomous_navigation_env"
+conda activate "autonomous_navigation_env"
+
+# this adds the conda-forge channel to the new created environment configuration 
+conda config --env --add channels conda-forge
+
+# and the robostack channel
+conda config --env --add channels robostack-staging
+
+# remove the defaults channel just in case, this might return an error if it is not in the list which is ok
+conda config --env --remove channels defaults
+
+
+# Install ros-humble into the environment (ROS2)
+conda install ros-humble-desktop
+
+conda deactivate
+conda activate "autonomous_navigation_env"
+
+# test rviz
 rviz2
 ```
 
-http://localhost:8080/vnc.html
+2. Install Gazebo
+
+```bash
+conda config --add channels conda-forge
+conda config --add channels robostack-humble
+conda config --set channel_priority strict
+
+# Modern Gazebo
+conda install ros-humble-gazebo-ros-pkgs
+
+# test gazebo
+gazebo
+```
+
+3. Colcon buuild
+
+```bash
+conda install colcon-common-extensions -c conda-forge
+
+conda install -c conda-forge cmake
+
+colcon build
+# or
+colcon build --symlink-install
+```
+
+4. Gazebo
+
+```bash
+nano ~/.gazebo/gui.ini
+
+[model_paths]
+filenames=/Users/wontothree/Desktop/develop/autonomous_navigation_ws/src/gazebo_simulator/GazeboFiles/models
+
+export ROS_DOMAIN_ID=1
+gazebo install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
+```
 
 ---
 

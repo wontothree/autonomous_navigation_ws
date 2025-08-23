@@ -7,6 +7,9 @@
     ├── meshes
     │   └── hokuyo.dae                  # 3d model blueprint
     ├── urdf                            # robot model
+    │   ├── diffbot.gazebo              # gazebo plugin
+    │   ├── diffbot.urdf
+    │   └── diffbot.urdf.xacro          # main
     ├── worlds
     │   └── simulator.world             # whole simulation environment (entry point)
     │    
@@ -26,22 +29,10 @@
 
 # Quick Start
 
+
+# Docker
+
 ```bash
-conda install -c robostack ros-humble-joint-state-publisher
+apt install ros-humble-joint-state-publisher
 ros2 pkg list | grep joint_state_publisher
-```
-
-```bash
-colcon build
-source install/setup.zsh
-gazebo install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
-
-ros2 launch gazebo_simulator robot_world.launch.py
-```
-
-```bash
-ps aux | grep gz
-pkill -f gz
-
-gazebo --verbose empty.world
 ```

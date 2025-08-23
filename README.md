@@ -14,6 +14,53 @@
 
 ## 🚀 Quick Start
 
+---
+
+## 🏗️ Technical Architecture
+
+- [Localization] Monte Carlo Localization
+- [Control] Model Predictive Path Integral Control
+
+### Architecture Diagram
+
+```mermaid
+mindmap
+  root(autonomous_navigation_ws)
+    (mc_localizaer)
+    (mppi_controller)
+```
+
+### Project Structure
+
+    autonomous_navigation_ws
+    └── src/
+        ├── mc_localizater/              # localization
+        └── mppi_controller/             # control
+
+---
+
+## Docker 
+
+```bash
+source /opt/ros/humble/setup.bash
+colcon build
+source install/setup.bash
+```
+
+```bash
+apt update
+apt install ros-humble-gazebo-ros-pkgs
+gazebo
+
+gazebo /root/autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
+ros2 launch gazebo_simulator robot_world.launch.py
+```
+
+[http://localhost:8080/vnc.html](http://localhost:8080/vnc.html)
+
+## Mac M1
+
+
 기타
 
 ```bash
@@ -88,52 +135,6 @@ filenames=/Users/wontothree/Desktop/develop/autonomous_navigation_ws/src/gazebo_
 
 export ROS_DOMAIN_ID=1
 gazebo install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
-```
-
----
-
-## 🏗️ Technical Architecture
-
-- [Localization] Monte Carlo Localization
-- [Control] Model Predictive Path Integral Control
-
-### Architecture Diagram
-
-```mermaid
-mindmap
-  root(autonomous_navigation_ws)
-    (mc_localizaer)
-    (mppi_controller)
-```
-
-### Project Structure
-
-    autonomous_navigation_ws
-    └── src/
-        ├── mc_localizater/              # localization
-        └── mppi_controller/             # control
-
----
-
-## Docker 
-
-```bash
-source /opt/ros/humble/setup.bash
-colcon build
-source install/setup.bash
-```
-
-```bash
-apt update
-apt install ros-humble-gazebo-ros-pkgs
-export GAZEBO_AUDIO=false
-gazebo
-
-gazebo /autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
-```
-
-```bash
-brew install --cask xquartz
-open -a XQuartz
+ros2 launch gazebo_simulator robot_world.launch.py
 
 ```

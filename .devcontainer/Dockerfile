@@ -13,8 +13,9 @@ FROM osrf/ros:humble-desktop-full
 
 # Set environment
 ENV DEBIAN_FRONTEND=noninteractive
-ENV DISPLAY=:0
+# ENV DISPLAY=:0
 ENV QT_X11_NO_MITSHM=1
+ENV ALSOFT_DRIVERS=null
 
 # Create workspace
 RUN mkdir -p /root/autonomous_navigation_ws/src

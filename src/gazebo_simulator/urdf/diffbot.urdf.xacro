@@ -2,7 +2,6 @@
 
 <robot name="skidbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- <xacro:include filename="$(find gcamp_gazebo)/urdf/diffbot.gazebo" /> -->
   <xacro:include filename="$(find gazebo_simulator)/urdf/diffbot.gazebo" />
 
   <link name="robot_footprint"></link>

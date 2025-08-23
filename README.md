@@ -74,6 +74,8 @@ conda install -c conda-forge cmake
 colcon build
 # or
 colcon build --symlink-install
+
+source install/setup.zsh
 ```
 
 4. Gazebo
@@ -112,3 +114,26 @@ mindmap
         └── mppi_controller/             # control
 
 ---
+
+## Docker 
+
+```bash
+source /opt/ros/humble/setup.bash
+colcon build
+source install/setup.bash
+```
+
+```bash
+apt update
+apt install ros-humble-gazebo-ros-pkgs
+export GAZEBO_AUDIO=false
+gazebo
+
+gazebo /autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
+```
+
+```bash
+brew install --cask xquartz
+open -a XQuartz
+
+```

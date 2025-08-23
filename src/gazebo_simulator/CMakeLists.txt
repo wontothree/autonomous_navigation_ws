@@ -32,9 +32,36 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-install(DIRECTORY worlds
-        DESTINATION share/${PROJECT_NAME})
+# add
+
 install(DIRECTORY GazeboFiles
         DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY urdf
+        DESTINATION share/${PROJECT_NAME}
+        FILES_MATCHING PATTERN "*.xacro" PATTERN "*.urdf.xacro")
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  worlds
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  urdf
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY urdf meshes worlds launch
+  DESTINATION share/${PROJECT_NAME}
+  PATTERN "*.urdf"
+  PATTERN "*.xacro"
+  PATTERN "*.gazebo"
+  PATTERN "*.dae"
+  PATTERN "*.world"
+  PATTERN "*.launch")
 
 ament_package()

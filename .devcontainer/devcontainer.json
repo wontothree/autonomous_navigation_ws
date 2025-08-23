@@ -12,5 +12,10 @@
     "remoteUser": "root",
     "forwardPorts": [
         11311
+    ],
+    // add
+    "runArgs": [
+        "-e", "DISPLAY=172.20.10.4:0",
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix:rw"
     ]
 }

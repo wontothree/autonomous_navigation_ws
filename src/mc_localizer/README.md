@@ -54,11 +54,11 @@ Logic
 |---|---|---|---|---|
 ||sample_particles||||
 ||update_particles_by_motion_model||omnidirectional model을 사용하여 `pose_tracking_particle_set_` 업데이트|||
-||`calculate_likelihoods_by_measurement_model`||||
-||`calculate_likelihoods_by_decision_model`||||
-||`calculate_likelihoods_from_global_localization`||||
-||`estimate_robot_pose`||||
-||`resample_particles`||||
+||calculate_likelihoods_by_measurement_model||||
+||calculate_likelihoods_by_decision_model||||
+||calculate_likelihoods_from_global_localization||||
+||estimate_robot_pose||||
+||resample_particles||||
 
 # `mc_localizer_ros.hpp`
 
@@ -71,3 +71,9 @@ Logic
 
 ## Functions
 
+|Return|Function|Input|Description|사용하는 Member Variables|
+|---|---|---|---|---|
+||callback_timer||||
+||callback_scan||||
+||callback_odom||||
+||callback_initial_pose||||

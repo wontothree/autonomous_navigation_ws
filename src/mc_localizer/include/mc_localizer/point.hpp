@@ -16,14 +16,14 @@ public:
 
     ~Point() {};
 
-    inline void setX(double x) { x_ = x; }
-    inline void setY(double y) { y_ = y; }
-    inline void setPoint(double x, double y) { x_ = x, y_ = y; }
-    inline void setPoint(Point p) { x_ = p.x_, y_ = p.y_; }
+    inline void set_x(double x) { x_ = x; }
+    inline void set_y(double y) { y_ = y; }
+    inline void set_point(double x, double y) { x_ = x, y_ = y; }
+    inline void set_point(Point p) { x_ = p.x_, y_ = p.y_; }
 
-    inline double getX(void) { return x_; }
-    inline double getY(void) { return y_; }
-    inline Point getPoint(void) { return Point(x_, y_); }
+    inline double get_x(void) { return x_; }
+    inline double get_y(void) { return y_; }
+    inline Point get_point(void) { return Point(x_, y_); }
 
 }; // class Point
 

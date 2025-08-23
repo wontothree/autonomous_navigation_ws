@@ -17,18 +17,20 @@ public:
     MCLocalizer();
     ~MCLocalizer() {};
 
-private:
+public:
     // pose
     double initial_pose_x_, initial_pose_y_, initial_pose_yaw_;
-    Pose mc_localizer_pose_;
+    double initial_pose_noise_x_, initial_pose_noise_y_, initial_pose_noise_yaw_;
+    Pose mcl_estimated_pose_;  // current estimated pose & finally estimated pose
+    Pose initial_pose_noise_;  // noise for initial sampling
     Pose base_link_to_laser_;
-    Pose mcl_estimated_pose_;
 
     // particles
     int particle_num_;
     std::vector<Particle> particles_; // tmp
     std::vector<Particle> pose_tracking_particle_set_;
 
+private:
     // map
     Pose map_origin_;
     double map_resolution_;
@@ -65,47 +67,47 @@ private:
 public:
     void sample_particles(const Pose &mean_pose, const Pose &noise_stddev);
 
-    void update_particles_by_motion_model(void);
+    // void update_particles_by_motion_model(void);
 
-    void calculate_likelihoods_by_measurement_model(void);
+    // void calculate_likelihoods_by_measurement_model(void);
 
-    void calculate_likelihoods_by_decision_model(void);
+    // void calculate_likelihoods_by_decision_model(void);
 
-    void calculate_likelihoods_from_global_localization(void);
+    // void calculate_likelihoods_from_global_localization(void);
 
-    void estimate_robot_pose(void);
+    // void estimate_robot_pose(void);
 
     void resample_particles(void);
 
 private:
-    template <typename T>
-    std::vector<T> getResidualErrors(Pose pose) {
-        double yaw = pose.getYaw();
-        double sensorX = baseLink2Laser_.getX() * cos(yaw) - baseLink2Laser_.getY() * sin(yaw) + pose.getX();
-        double sensorY = baseLink2Laser_.getX() * sin(yaw) + baseLink2Laser_.getY() * cos(yaw) + pose.getY();
-        double sensorYaw = baseLink2Laser_.getYaw() + yaw;
-        int size = (int)scan_.ranges.size();
-        std::vector<T> residualErrors(size);
-        for (int i = 0; i < size; ++i) {
-            double r = scan_.ranges[i];
-            if (r <= scan_.range_min || scan_.range_max <= r) {
-                residualErrors[i] = -1.0;
-                continue;
-            }
-            double t = (double)i * scan_.angle_increment + scan_.angle_min + sensorYaw;
-            double x = r * cos(t) + sensorX;
-            double y = r * sin(t) + sensorY;
-            int u, v;
-            xy2uv(x, y, &u, &v);
-            if (onMap(u, v)) {
-                T dist = (T)distMap_.at<float>(v, u);
-                residualErrors[i] = dist;
-            } else {
-                residualErrors[i] = -1.0;
-            }
-        }
-        return residualErrors;
-    }
+    // template <typename T>
+    // std::vector<T> getResidualErrors(Pose pose) {
+    //     double yaw = pose.get_yaw();
+    //     double sensorX = base_link_to_laser_.get_x() * cos(yaw) - base_link_to_laser_.get_y() * sin(yaw) + pose.get_x();
+    //     double sensorY = base_link_to_laser_.get_x() * sin(yaw) + base_link_to_laser_.get_y() * cos(yaw) + pose.get_y();
+    //     double sensorYaw = base_link_to_laser_.get_yaw() + yaw;
+    //     int size = (int)scan_.ranges.size();
+    //     std::vector<T> residualErrors(size);
+    //     for (int i = 0; i < size; ++i) {
+    //         double r = scan_.ranges[i];
+    //         if (r <= scan_.range_min || scan_.range_max <= r) {
+    //             residualErrors[i] = -1.0;
+    //             continue;
+    //         }
+    //         double t = (double)i * scan_.angle_increment + scan_.angle_min + sensorYaw;
+    //         double x = r * cos(t) + sensorX;
+    //         double y = r * sin(t) + sensorY;
+    //         int u, v;
+    //         xy2uv(x, y, &u, &v);
+    //         if (is_on_map(u, v)) {
+    //             T dist = (T)distMap_.at<float>(v, u);
+    //             residualErrors[i] = dist;
+    //         } else {
+    //             residualErrors[i] = -1.0;
+    //         }
+    //     }
+    //     return residualErrors;
+    // }
 
 private:
     // ---------------------------------------------------------------------------- //
@@ -157,9 +159,9 @@ private:
      * @member map_resolution_ 지도의 해상도(resolution)를 나타냅니다.
      */
     inline void xy2uv(double x, double y, int *u, int *v) {
-        double dx = x - map_origin_.getX();
-        double dy = y - map_origin_.getY();
-        double yaw = -map_origin_.getYaw();
+        double dx = x - map_origin_.get_x();
+        double dy = y - map_origin_.get_y();
+        double yaw = -map_origin_.get_yaw();
         double xx = dx * cos(yaw) - dy * sin(yaw);
         double yy = dx * sin(yaw) + dy * cos(yaw);
         *u = (int)(xx / map_resolution_);
@@ -182,11 +184,11 @@ private:
     inline void uv2xy(int u, int v, double *x, double *y) {
         double xx = (double)u * map_resolution_;
         double yy = (double)v * map_resolution_;
-        double yaw = -map_origin_.getYaw();
+        double yaw = -map_origin_.get_yaw();
         double dx = xx * cos(yaw) + yy * sin(yaw);
         double dy = -xx * sin(yaw) + yy * cos(yaw);
-        *x = dx + map_origin_.getX();
-        *y = dy + map_origin_.getY();
+        *x = dx + map_origin_.get_x();
+        *y = dy + map_origin_.get_y();
     }
 
 }; // class mc_localizer

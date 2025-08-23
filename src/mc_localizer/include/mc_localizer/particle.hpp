@@ -19,11 +19,11 @@ public:
 
     ~Particle() {};
 
-    inline double getX(void) { return pose_.get_x(); }
-    inline double getY(void) { return pose_.get_y(); }
-    inline double getYaw(void) { return pose_.get_yaw(); }
-    inline Pose getPose(void) { return pose_; }
-    inline double getWeight(void) { return weight_; }
+    inline double get_x(void) const { return pose_.get_x(); }
+    inline double get_y(void) const { return pose_.get_y(); }
+    inline double get_yaw(void) const { return pose_.get_yaw(); }
+    inline Pose get_pose(void) const { return pose_; }
+    inline double get_weight(void) const { return weight_; }
 
     inline void set_x(double x) { pose_.set_x(x); }
     inline void set_y(double y) { pose_.set_y(y); }

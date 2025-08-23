@@ -6,7 +6,7 @@ int main(int argc, char ** argv)
     std::cout << "package mc_localizer is started\n";
 
     // entry point
-    rclcpp::spin(std::make_shared<MCLocalizerROS>());
+    rclcpp::spin(std::make_shared<mc_localizer::MCLocalizerROS>());
 
     rclcpp::shutdown();
     std::cout << "shutdown" << std::endl;

@@ -9,7 +9,7 @@ class Pose {
 private:
     double x_, y_, yaw_;
 
-    void modifyYaw(void) {
+    void normalize_yaw(void) {
         while (yaw_ < -M_PI)
             yaw_ += 2.0 * M_PI;
         while (yaw_ > M_PI)
@@ -27,9 +27,9 @@ public:
 
     inline void set_x(double x) { x_ = x; }
     inline void set_y(double y) { y_ = y; }
-    inline void set_yaw(double yaw) { yaw_ = yaw, modifyYaw(); }
-    inline void set_pose(double x, double y, double yaw) { x_ = x, y_ = y, yaw_ = yaw, modifyYaw(); }
-    inline void set_pose(Pose p) { x_ = p.x_, y_ = p.y_, yaw_ = p.yaw_, modifyYaw(); }
+    inline void set_yaw(double yaw) { yaw_ = yaw, normalize_yaw(); }
+    inline void set_pose(double x, double y, double yaw) { x_ = x, y_ = y, yaw_ = yaw, normalize_yaw(); }
+    inline void set_pose(Pose p) { x_ = p.x_, y_ = p.y_, yaw_ = p.yaw_, normalize_yaw(); }
 
     inline double get_x(void) const { return x_; }
     inline double get_y(void) const { return y_; }

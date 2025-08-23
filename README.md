@@ -58,8 +58,16 @@ ros2 launch gazebo_simulator robot_world.launch.py
 
 [http://localhost:8080/vnc.html](http://localhost:8080/vnc.html)
 
-## Mac M1
+```bash
+ps aux | grep -E 'gzserver|gzclient|ros2'
 
+pkill -f gzserver
+pkill -f gzclient
+pkill -f ros2
+kill -9 12180
+```
+
+## Mac M1
 
 기타
 
@@ -111,7 +119,7 @@ conda install ros-humble-gazebo-ros-pkgs
 gazebo
 ```
 
-3. Colcon buuild
+3. Colcon build
 
 ```bash
 conda install colcon-common-extensions -c conda-forge

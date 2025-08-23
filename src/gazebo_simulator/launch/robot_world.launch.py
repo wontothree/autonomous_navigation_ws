@@ -73,15 +73,19 @@ def generate_launch_description():
     )
 
     # 4. Spawn Entity (필수)
-    # Headless로 실행된 Gazebo 서버에 로봇 모델을 스폰합니다.
-    spawn_entity_node = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        output='screen',
-        arguments=['-topic', 'robot_description',
-                   '-entity', 'diffbot',
-                   '-x', '0.0', '-y', '0.0', '-z', '0.5'],
-        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
+    spawn_entity_node = TimerAction(
+        period=5.0,  # Gazebo가 안정적으로 실행될 시간을 확보
+        actions=[
+            Node(
+                package='gazebo_ros',
+                executable='spawn_entity.py',
+                output='screen',
+                arguments=['-topic', 'robot_description',
+                        '-entity', 'diffbot',
+                        '-x', '0.0', '-y', '0.0', '-z', '0.05'],  # Z 좌표 조금 낮춤
+                parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
+            )
+        ]
     )
 
     # 5. RViz2 실행 (필수)

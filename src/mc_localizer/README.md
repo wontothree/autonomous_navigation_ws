@@ -19,6 +19,21 @@ Monte Carlo Localization Module
     ├── CMakeLists.txt                             
     └── package.xml    
 
+# Subscribed Topics
+
+Following messages (topics) are needed to be published;
+
+- sensor_msgs/msg/LserScan (`/scan`)
+- nav_msgs/msg/Odometry (`/odom`)
+- nav_msgs/msg/OccupancyGrid (`/map`)
+
+Also, static transformation between following two frames is needed to be set.
+
+- origin of a robot (base_link)
+- 2D LiDAR (laser)
+
+# Published Topics
+
 # `mc_localizer.h` and `mc_localizer.cpp`
 
 ## Member Variables

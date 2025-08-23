@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<robot>
-
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- diff_drive controller -->
   <gazebo>
     <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
@@ -100,14 +99,36 @@
         </noise>
       </ray>
       <update_rate>30</update_rate>
+      
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
         <ros>
           <namespace>/diffbot</namespace>
           <argument>~/out:=scan</argument>
         </ros>
         <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>hokuyo</frame_name>
       </plugin>
+
     </sensor>
   </gazebo>
 
+  <gazebo reference="chassis">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+  <gazebo reference="left_track">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="right_track">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="camera">
+    <material>Gazebo/Gray</material>
+  </gazebo>
+
+  <gazebo reference="hokuyo">
+    <material>Gazebo/Black</material>
+  </gazebo>
 </robot>

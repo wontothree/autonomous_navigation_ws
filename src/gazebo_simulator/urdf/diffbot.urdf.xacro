@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 
-<robot name="skidbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="diffbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find gazebo_simulator)/urdf/diffbot.gazebo" />
 
@@ -13,7 +13,7 @@
   </joint>
 
   <link name='chassis'>
-    <pose>0 0 0.1 0 0 0</pose>
+    <!-- <pose>0 0 0.1 0 0 0</pose> -->
 
     <inertial>
       <mass value="15.0"/>
@@ -162,7 +162,7 @@
       </geometry>
     </visual>
 
-    <collision name="camera_colision">
+    <collision name="camera_collision">
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <box size="0.05 0.05 0.05"/>
@@ -184,7 +184,7 @@
       </geometry>
     </visual>
 
-    <collision name="hokuyo_colision">
+    <collision name="hokuyo_collision">
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <box size="0.1 0.1 0.1"/>
@@ -237,7 +237,7 @@
     <axis xyz="0 1 0" rpy="0 0 0"/>
   </joint>
 
-  <gazebo reference="chassis">
+  <!-- <gazebo reference="chassis">
     <material>Gazebo/Green</material>
   </gazebo>
 
@@ -255,6 +255,6 @@
 
   <gazebo reference="hokuyo">
     <material>Gazebo/Black</material>
-  </gazebo>
+  </gazebo> -->
 
 </robot>

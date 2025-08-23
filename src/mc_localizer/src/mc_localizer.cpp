@@ -26,53 +26,44 @@ MCLocalizer::MCLocalizer()
     initial_pose_yaw_ *= M_PI / 180.0;
 
     // set initial pose
-    mc_localizer_pose_.setPose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
-    resetParticlesDistribution();
+    mc_localizer_pose_.set_pose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
+    sample_particles(mc_localizer_pose_, noise_pose_);
     resetReliabilities();
 }
 
-/*
+/**
+ * @brief Gaussian random sampling using initial pose (step 1)
+ * @member pose_tracking_particle_set_
+ */
 void MCLocalizer::sample_particles(
     const Pose &mean_pose,
-    const Pose &noise_standard_deviation
-)
-{
-    // 1. 파티클 개수는 멤버 변수로 가지고 있다고 가정합니다.
-    //    (예: int num_particles_;)
-    particles_.resize(num_particles_);
-
-    // 2. 입력받은 포즈에서 값 추출
-    double xo   = mean_pose.getX();
-    double yo   = mean_pose.getY();
-    double yawo = mean_pose.getYaw();
-
-    double std_x   = noise_standard_deviation.getX();
-    double std_y   = noise_standard_deviation.getY();
-    double std_yaw = noise_standard_deviation.getYaw();
-
-    double wo = 1.0 / static_cast<double>(num_particles_);
-
-    // 3. 루프 돌며 파티클 생성
-    for (int i = 0; i < num_particles_; ++i) {
-        double x   = xo   + nrand(std_x);
-        double y   = yo   + nrand(std_y);
-        double yaw = yawo + nrand(std_yaw);
-
-        particles_[i].setPose(x, y, yaw);
-        particles_[i].setW(wo);
-    }
-}
-*/
-void MCLocalizer::sample_particles(
-    const Pose &mean_pose,
-    const Pose &noise_standard_deviation 
+    const Pose &standard_deviation_pose 
 )
 {
     // set up size of particle set
     pose_tracking_particle_set_.resize(particle_num_);
 
-    // extract mean pose
-    // -------------------
+    // extract mean pose and standard deviation
+    double mean_x = mean_pose.get_x();
+    double mean_y = mean_pose.get_y();
+    double mean_yaw = mean_pose.get_yaw();
+    double standard_deviation_x = standard_deviation_pose.get_x();
+    double standard_deviation_y = standard_deviation_pose.get_y();
+    double standard_deviation_yaw = standard_deviation_pose.get_yaw();
+
+    // set same weight (guarantee int)
+    double weight = 1.0 / static_cast<double>(particle_num_);
+
+    // generate particle set
+    for (int i = 0; i < particle_num_; ++i) {
+        double x = mean_x + nrand(standard_deviation_x);
+        double y = mean_y + nrand(standard_deviation_y);
+        double yaw = mean_yaw + nrand(standard_deviation_yaw);
+
+        // store particle samples
+        pose_tracking_particle_set_[i].set_pose(x, y, yaw);
+        pose_tracking_particle_set_[i].set_weight(weight);
+    }
 }
 
 /**

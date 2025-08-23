@@ -19,18 +19,18 @@ public:
 
     ~Particle() {};
 
-    inline double getX(void) { return pose_.getX(); }
-    inline double getY(void) { return pose_.getY(); }
-    inline double getYaw(void) { return pose_.getYaw(); }
+    inline double getX(void) { return pose_.get_x(); }
+    inline double getY(void) { return pose_.get_y(); }
+    inline double getYaw(void) { return pose_.get_yaw(); }
     inline Pose getPose(void) { return pose_; }
     inline double getWeight(void) { return weight_; }
 
-    inline void setX(double x) { pose_.setX(x); }
-    inline void setY(double y) { pose_.setY(y); }
-    inline void setYaw(double yaw) { pose_.setYaw(yaw); }
-    inline void setPose(double x, double y, double yaw) { pose_.setPose(x, y, yaw); }
-    inline void setPose(Pose p) { pose_.setPose(p); }
-    inline void setWeight(double weight) { weight_ = weight; }
+    inline void set_x(double x) { pose_.set_x(x); }
+    inline void set_y(double y) { pose_.set_y(y); }
+    inline void set_yaw(double yaw) { pose_.set_yaw(yaw); }
+    inline void set_pose(double x, double y, double yaw) { pose_.set_pose(x, y, yaw); }
+    inline void set_pose(Pose p) { pose_.set_pose(p); }
+    inline void set_weight(double weight) { weight_ = weight; }
 }; // class Particle
 
 } // namespace mc_localizer

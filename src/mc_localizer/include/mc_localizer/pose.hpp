@@ -25,16 +25,16 @@ public:
 
     ~Pose() {};
 
-    inline void setX(double x) { x_ = x; }
-    inline void setY(double y) { y_ = y; }
-    inline void setYaw(double yaw) { yaw_ = yaw, modifyYaw(); }
-    inline void setPose(double x, double y, double yaw) { x_ = x, y_ = y, yaw_ = yaw, modifyYaw(); }
-    inline void setPose(Pose p) { x_ = p.x_, y_ = p.y_, yaw_ = p.yaw_, modifyYaw(); }
+    inline void set_x(double x) { x_ = x; }
+    inline void set_y(double y) { y_ = y; }
+    inline void set_yaw(double yaw) { yaw_ = yaw, modifyYaw(); }
+    inline void set_pose(double x, double y, double yaw) { x_ = x, y_ = y, yaw_ = yaw, modifyYaw(); }
+    inline void set_pose(Pose p) { x_ = p.x_, y_ = p.y_, yaw_ = p.yaw_, modifyYaw(); }
 
-    inline double getX(void) { return x_; }
-    inline double getY(void) { return y_; }
-    inline double getYaw(void) { return yaw_; }
-    inline Pose getPose(void) { return Pose(x_, y_, yaw_); }
+    inline double get_x(void) const { return x_; }
+    inline double get_y(void) const { return y_; }
+    inline double get_yaw(void) const { return yaw_; }
+    inline Pose get_pose(void) { return Pose(x_, y_, yaw_); }
 
 }; // class Pose
 

@@ -2,13 +2,14 @@
 
 int main(int argc, char ** argv)
 {
-  rclcpp::init(argc, argv);
-  std::cout << "package mc_localizer is started\n";
+    rclcpp::init(argc, argv);
+    std::cout << "package mc_localizer is started\n";
 
-  rclcpp::spin(std::make_shared<MCLocalizerRos>());;
+    // entry point
+    rclcpp::spin(std::make_shared<MCLocalizerROS>());
 
-  rclcpp::shutdown();
-  std::cout << "shutdown" << std::endl;
+    rclcpp::shutdown();
+    std::cout << "shutdown" << std::endl;
 
-  return 0;
+    return 0;
 }

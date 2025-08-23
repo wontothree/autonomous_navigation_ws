@@ -50,14 +50,15 @@ Also, static transformation between following two frames is needed to be set.
 
 Logic
 
-|Index|Function|Description|사용하는 Member Variables|
-|---|---|---|---|
-||`update_particles_by_motion_model`|omnidirectional model을 사용하여 `pose_tracking_particle_set_` 업데이트||
-||`calculate_likelihoods_by_measurement_model`|||
-||`calculate_likelihoods_by_decision_model`|||
-||`calculate_likelihoods_from_global_localization`|||
-||`estimate_robot_pose`|||
-||`resample_particles`|||
+|Return|Function|Input|Description|사용하는 Member Variables|
+|---|---|---|---|---|
+||sample_particles||||
+||update_particles_by_motion_model||omnidirectional model을 사용하여 `pose_tracking_particle_set_` 업데이트|||
+||`calculate_likelihoods_by_measurement_model`||||
+||`calculate_likelihoods_by_decision_model`||||
+||`calculate_likelihoods_from_global_localization`||||
+||`estimate_robot_pose`||||
+||`resample_particles`||||
 
 # `mc_localizer_ros.hpp`
 
@@ -67,3 +68,6 @@ Logic
 |---|---|---|---|---|
 ||std::string|scan_topic_name_|||
 ||std::string|odom_topic_name_|||
+
+## Functions
+

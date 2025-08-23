@@ -5,10 +5,10 @@
 #include <sensor_msgs/msg/laser_scan.hpp> // sensor_msgs::msg::LaserScan
 #include <nav_msgs/msg/odometry.hpp>      // nav_msgs::msg::Odometry
 
-class MCLocalizerRos : public rclcpp::Node {
+class MCLocalizerROS : public rclcpp::Node {
 public:
-    MCLocalizerRos();
-    ~MCLocalizerRos() {};
+    MCLocalizerROS();
+    ~MCLocalizerROS() {};
 
 private:
     const int timer_period = 10;             // timer period (ms)
@@ -19,10 +19,16 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscriber_;
 
+    // callback_scan
+    sensor_msgs::msg::LaserScan scan_;
+
 private:
     void callback_timer();
 
-    void callback_scan(sensor_msgs::msg::LaserScan::SharedPtr scan);
+    /**
+     * @members scan_
+     */
+    void callback_scan(const sensor_msgs::msg::LaserScan::SharedPtr &scan);
 
     void callback_odom(const nav_msgs::msg::Odometry::SharedPtr odom);
 };

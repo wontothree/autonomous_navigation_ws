@@ -19,14 +19,15 @@ public:
 
 private:
     // pose
-    double inital_pose_x_, inital_pose_y_, inital_pose_yaw_;
+    double initial_pose_x_, initial_pose_y_, initial_pose_yaw_;
     Pose mc_localizer_pose_;
     Pose base_link_to_laser_;
     Pose mcl_estimated_pose_;
 
     // particles
     int particle_num_;
-    std::vector<Particle> particles_;
+    std::vector<Particle> particles_; // tmp
+    std::vector<Particle> pose_tracking_particle_set_;
 
     // map
     Pose map_origin_;
@@ -62,6 +63,8 @@ private:
     bool can_use_global_localization_sample = false;
 
 public:
+    void sample_particles(const Pose &mean_pose, const Pose &noise_stddev);
+
     void update_particles_by_motion_model(void);
 
     void calculate_likelihoods_by_measurement_model(void);

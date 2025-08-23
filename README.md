@@ -15,9 +15,12 @@
 ## 🚀 Quick Start
 
 ```bash
-source /opt/ros/humble/setup.bash
 colcon build
+source /opt/ros/humble/setup.bash
 source install/setup.bash
+
+# or
+. set.sh
 ```
 
 ```bash
@@ -141,5 +144,4 @@ filenames=/Users/wontothree/Desktop/develop/autonomous_navigation_ws/src/gazebo_
 export ROS_DOMAIN_ID=1
 gazebo install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
 ros2 launch gazebo_simulator robot_world.launch.py
-
 ```

@@ -5,10 +5,9 @@ namespace mc_localizer {
 MCLocalizer::MCLocalizer()
 {
     // pose
-    inital_pose_x_ = 0;
-    inital_pose_y_ = 0;
-    inital_pose_yaw_ = 0;
-    mc_localizer_pose_.setPose(inital_pose_x_, inital_pose_y_, inital_pose_yaw_);
+    initial_pose_x_ = 0;
+    initial_pose_y_ = 0;
+    initial_pose_yaw_ = 0;
 
     // particles
     particle_num_ = 100;
@@ -20,6 +19,60 @@ MCLocalizer::MCLocalizer()
     delta_yaw_ = 0.0;
     is_omnidirectional_model = true;
     odom_noise_odm_ = {1.0, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0};
+
+
+    // step 1
+    // degree to radian
+    initial_pose_yaw_ *= M_PI / 180.0;
+
+    // set initial pose
+    mc_localizer_pose_.setPose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
+    resetParticlesDistribution();
+    resetReliabilities();
+}
+
+/*
+void MCLocalizer::sample_particles(
+    const Pose &mean_pose,
+    const Pose &noise_standard_deviation
+)
+{
+    // 1. 파티클 개수는 멤버 변수로 가지고 있다고 가정합니다.
+    //    (예: int num_particles_;)
+    particles_.resize(num_particles_);
+
+    // 2. 입력받은 포즈에서 값 추출
+    double xo   = mean_pose.getX();
+    double yo   = mean_pose.getY();
+    double yawo = mean_pose.getYaw();
+
+    double std_x   = noise_standard_deviation.getX();
+    double std_y   = noise_standard_deviation.getY();
+    double std_yaw = noise_standard_deviation.getYaw();
+
+    double wo = 1.0 / static_cast<double>(num_particles_);
+
+    // 3. 루프 돌며 파티클 생성
+    for (int i = 0; i < num_particles_; ++i) {
+        double x   = xo   + nrand(std_x);
+        double y   = yo   + nrand(std_y);
+        double yaw = yawo + nrand(std_yaw);
+
+        particles_[i].setPose(x, y, yaw);
+        particles_[i].setW(wo);
+    }
+}
+*/
+void MCLocalizer::sample_particles(
+    const Pose &mean_pose,
+    const Pose &noise_standard_deviation 
+)
+{
+    // set up size of particle set
+    pose_tracking_particle_set_.resize(particle_num_);
+
+    // extract mean pose
+    // -------------------
 }
 
 /**

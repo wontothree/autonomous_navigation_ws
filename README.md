@@ -14,6 +14,31 @@
 
 ## 🚀 Quick Start
 
+```bash
+source /opt/ros/humble/setup.bash
+colcon build
+source install/setup.bash
+```
+
+```bash
+apt update
+apt install ros-humble-gazebo-ros-pkgs
+gazebo
+
+gazebo /root/autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
+ros2 launch gazebo_simulator robot_world.launch.py
+```
+
+[http://localhost:8080/vnc.html](http://localhost:8080/vnc.html)
+
+```bash
+ps aux | grep -E 'gzserver|gzclient|ros2'
+
+pkill -f gzserver
+pkill -f gzclient
+pkill -f ros2
+```
+
 ---
 
 ## 🏗️ Technical Architecture
@@ -38,34 +63,6 @@ mindmap
         └── mppi_controller/             # control
 
 ---
-
-## Docker 
-
-```bash
-source /opt/ros/humble/setup.bash
-colcon build
-source install/setup.bash
-```
-
-```bash
-apt update
-apt install ros-humble-gazebo-ros-pkgs
-gazebo
-
-gazebo /root/autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
-ros2 launch gazebo_simulator robot_world.launch.py
-```
-
-[http://localhost:8080/vnc.html](http://localhost:8080/vnc.html)
-
-```bash
-ps aux | grep -E 'gzserver|gzclient|ros2'
-
-pkill -f gzserver
-pkill -f gzclient
-pkill -f ros2
-kill -9 12180
-```
 
 ## Mac M1
 

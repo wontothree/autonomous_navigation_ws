@@ -12,6 +12,7 @@ include_directories(include/)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 # src 안에 있는 모든 실행 파일을 추가한다. -> 실행 파일을 만든다.
 add_executable(mc_localizer_node 
@@ -23,6 +24,7 @@ add_executable(mc_localizer_node
 ament_target_dependencies(mc_localizer_node
   rclcpp
   sensor_msgs
+  nav_msgs
 )
 
 # 실행 파일을 설치 경로에 복사한다.

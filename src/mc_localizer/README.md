@@ -2,20 +2,20 @@
 
 Monte Carlo Localization Module
 
-    als_ros
-    ├── include/als_ros     
-        ├── mc_localizer_ros.h    
-        ├── mc_localizer.h                             # logic
-        ├── mae_classifier.h                           # 
-        ├── histogram.h
-        ├── particle.h                                 # [data struecture] 한 입자 (x, y, yaw, weight)
-        ├── pose.h                                     # [data struecture] 한 자세 (x, y, yaw)
-        └── point.h                                    # [data struecture] 한 점 (x, y)
+    mc_localizer
+    ├── include/mc_localizer     
+    │   ├── mc_localizer_ros.h                         # callback, visualization, and ROS functions
+    │   ├── mc_localizer.h                             # logic
+    │   ├── mae_classifier.h                           # 
+    │   ├── histogram.h
+    │   ├── particle.h                                 # [data struecture] 한 입자 (x, y, yaw, weight)
+    │   ├── pose.h                                     # [data struecture] 한 자세 (x, y, yaw)
+    │   └── point.h                                    # [data struecture] 한 점 (x, y)
     ├── launch/                            
     ├── src/     
-        ├── mc_localizer_node.cpp                      # 
-        ├── mc_localizer_ros.cpp                       # 
-        └── mc_localizer.cpp                           # 
+    │   ├── mc_localizer_node.cpp                      # entry point
+    │   ├── mc_localizer_ros.cpp                       # 
+    │   └── mc_localizer.cpp                           # 
     ├── CMakeLists.txt                             
     └── package.xml    
 
@@ -23,7 +23,7 @@ Monte Carlo Localization Module
 
 Following messages (topics) are needed to be published;
 
-- sensor_msgs/msg/LserScan (`/scan`)
+- sensor_msgs/msg/LaserScan (`/scan`)
 - nav_msgs/msg/Odometry (`/odom`)
 - nav_msgs/msg/OccupancyGrid (`/map`)
 
@@ -58,3 +58,12 @@ Logic
 ||`calculate_likelihoods_from_global_localization`|||
 ||`estimate_robot_pose`|||
 ||`resample_particles`|||
+
+# `mc_localizer_ros.hpp`
+
+## Member Variables
+
+|Index|Type|Variable|Initialization|Description|
+|---|---|---|---|---|
+||std::string|scan_topic_name_|||
+||std::string|odom_topic_name_|||

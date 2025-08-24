@@ -39,6 +39,9 @@ MCLocalizerROS::MCLocalizerROS() : Node("mc_localizer_node")
         std::chrono::milliseconds(timer_period_),
         [this]() { this->callback_timer(); }
     );
+
+    // flags
+    is_initialized_ = false;
 }
 
 void MCLocalizerROS::callback_timer()
@@ -46,6 +49,12 @@ void MCLocalizerROS::callback_timer()
     publish_particle_set(mclocalizer_object_.pose_tracking_particle_set_);
 }
 
+/**
+ * @modifies mclocalizer_object_.mcl_estimated_pose_
+ * @modefies pose_tracking_particle_set_ indirectly by function initialize_particle_set
+ * 
+ * @modifies is_initialized_
+ */
 void MCLocalizerROS::callback_initial_pose(
     const std::shared_ptr<const geometry_msgs::msg::PoseWithCovarianceStamped> initial_pose
 )
@@ -70,15 +79,15 @@ void MCLocalizerROS::callback_initial_pose(
         yaw
     );
 
-    // random sampling particles to generate particle set
-    mclocalizer_object_.sample_particles(mclocalizer_object_.mcl_estimated_pose_, mclocalizer_object_.initial_pose_noise_);
+    // random sampling particles to initialize particle set
+    mclocalizer_object_.initialize_particle_set(mclocalizer_object_.mcl_estimated_pose_, mclocalizer_object_.initial_noise_);
 
     // // 필요 시 신뢰도 초기화
     // if (estimateReliability_)
     //     resetReliabilities();
 
-    // // 초기화 완료 flag
-    // isInitialized_ = true;
+    // 초기화 완료 flag
+    is_initialized_ = true;
 }
 
 void MCLocalizerROS::callback_scan(const sensor_msgs::msg::LaserScan::SharedPtr &scan)
@@ -89,9 +98,67 @@ void MCLocalizerROS::callback_scan(const sensor_msgs::msg::LaserScan::SharedPtr 
     //     gotScan_ = true;
 }
 
+// getter, setter 함수를 사용하는 게 나을까?
+/**
+ * @modifies is_initialized_
+ * @modifies odom_pose_timestamp_
+ * 
+ * @modifies mclocalizer_object_ : delta_x_, delta_y_, delta_distance_, delta_yaw_
+ * @modifies mclocalizer_object_ : delta_time_sum_
+ * @modifies mclocalizer_object_ : odom_pose_
+ */
 void MCLocalizerROS::callback_odom(const nav_msgs::msg::Odometry::SharedPtr odom)
 {
-    // std::cout << "odom callback" << std::endl;
+    static double previous_time;
+    double current_time = rclcpp::Time(odom->header.stamp).seconds();
+
+    // inspection whether initialized
+    if (!is_initialized_) {
+        previous_time = current_time;
+        is_initialized_ = true;
+        return;
+    }
+
+    // terminate if current_time == previous_time
+    double delta_time = current_time - previous_time;
+    if (delta_time == 0.0) return;
+
+    // current timestamp
+    odom_pose_timestamp_ = rclcpp::Time(odom->header.stamp);
+
+    // update delta values
+    mclocalizer_object_.delta_x_ += odom->twist.twist.linear.x * delta_time;
+    mclocalizer_object_.delta_y_ += odom->twist.twist.linear.y * delta_time;
+    mclocalizer_object_.delta_distance_ += odom->twist.twist.linear.x * delta_time;
+    mclocalizer_object_.delta_yaw_ += odom->twist.twist.angular.z * delta_time;
+
+    // normalize yaw
+    while (mclocalizer_object_.delta_yaw_ < - M_PI) mclocalizer_object_.delta_yaw_ += 2.0 * M_PI;
+    while (mclocalizer_object_.delta_yaw_ > M_PI) mclocalizer_object_.delta_yaw_ -= 2.0 * M_PI;
+
+    mclocalizer_object_.delta_time_sum_ += delta_time;
+
+    // declare quaternion
+    tf2::Quaternion orientation_quaternion(
+        odom->pose.pose.orientation.x,
+        odom->pose.pose.orientation.y,
+        odom->pose.pose.orientation.z,
+        odom->pose.pose.orientation.w
+    );
+
+    // calculate roll, pitch, yaw and we only take yaw
+    double roll, pich, yaw;
+    tf2::Matrix3x3 rotation_matrix(orientation_quaternion);
+    rotation_matrix.getRPY(roll, pich, yaw);
+
+    // set robot pose
+    mclocalizer_object_.odom_pose_.set_pose(
+        odom->pose.pose.position.x,
+        odom->pose.pose.position.y,
+        yaw
+    );
+
+    previous_time = current_time;
 }
 
 void MCLocalizerROS::publish_particle_set(const std::vector<Particle>& particle_set)

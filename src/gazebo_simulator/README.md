@@ -25,14 +25,25 @@
     │   ├── skibot.rviz
     │   └── tinybot.rviz
 
-# Quick Start
+# 🚀 Quick Start
 
 ```bash
-apt install ros-humble-joint-state-publisher
-ros2 pkg list | grep joint_state_publisher
+# dependencies
+apt update
+apt install ros-humble-joint-state-publisher # ros2 pkg list | grep joint_state_publisher
+apt install ros-humble-gazebo-ros-pkgs       # gazebo
+
+colcon build
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+
+gazebo /root/autonomous_navigation_ws/install/gazebo_simulator/share/gazebo_simulator/worlds/simulator.world
+ros2 launch gazebo_simulator robot_world.launch.py
 ```
 
-# Teleoperation
+[http://localhost:8080/vnc.html](http://localhost:8080/vnc.html)
+
+## Teleoperation
 
 ```bash
 # dependencies
@@ -41,6 +52,21 @@ apt-get install -y ros-humble-teleop-twist-keyboard
 
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/diffbot/cmd_vel
 ```
+
+# 🗨️ Published Topics
+
+- `/clicked_point`
+- `/clock`
+- `/diffbot/cmd_vel`
+- `/diffbot/odom`
+- `/diffbot/scan`
+- `/goal_pose`
+- `/initialpose`
+- `/joint_states`
+- `/performance_metrics`
+- `/robot_description`
+- `/tf`
+- `/tf_static`
 
 # Reference
 

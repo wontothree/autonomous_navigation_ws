@@ -42,6 +42,12 @@ private:
     // class object
     MCLocalizer mclocalizer_object_;
 
+    // timestamp
+    rclcpp::Time odom_pose_timestamp_;
+
+    // flags
+    bool is_initialized_;
+
 private: // callback functions
     void callback_timer();
 

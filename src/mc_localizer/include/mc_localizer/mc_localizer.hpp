@@ -22,6 +22,7 @@ public:
     double initial_pose_x_, initial_pose_y_, initial_pose_yaw_;
     double initial_noise_x_, initial_noise_y_, initial_noise_yaw_;
     Pose mcl_estimated_pose_;  // current estimated pose & finally estimated pose
+    Pose odom_pose_;
     Pose initial_noise_;  // noise for initial sampling
     Pose base_link_to_laser_;
 
@@ -30,16 +31,17 @@ public:
     std::vector<Particle> particles_; // tmp
     std::vector<Particle> pose_tracking_particle_set_;
 
+    // motion
+    double delta_x_, delta_y_, delta_distance_, delta_yaw_;
+    double delta_x_sum_, delta_y_sum_, delta_distance_sum_, delta_yaw_sum_, delta_time_sum_;
+
 private:
     // map
     Pose map_origin_;
     double map_resolution_;
     int map_width_, map_height_;
 
-    // motion
-    double delta_x_, delta_y_, delta_distance_, delta_yaw_;
-    double delta_x_sum_, delta_y_sum_, delta_distance_sum_, delta_yaw_sum_, delta_time_sume_;
-    bool is_omnidirectional_model;
+    // motion (updating by odom)
     std::vector<double> odom_differential_drive_model_noise_; // distance noise for distance^2, distance noise for yaw^2, yaw noise for distance^2, yaw noise for yaw^2
 
     // measurements

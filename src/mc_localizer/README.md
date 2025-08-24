@@ -19,7 +19,7 @@ Monte Carlo Localization Module
     ├── CMakeLists.txt                             
     └── package.xml    
 
-# Subscribed Topics
+# 💬 Subscribed Topics
 
 Following messages (topics) are needed to be published;
 
@@ -32,8 +32,12 @@ Also, static transformation between following two frames is needed to be set.
 - origin of a robot (base_link)
 - 2D LiDAR (laser)
 
-# Published Topics
+# 🗨️ Published Topics
 
 # Nodes
 
 `mc_localizer_node`
+
+# Reference
+
+https://github.com/NaokiAkai/als_ros

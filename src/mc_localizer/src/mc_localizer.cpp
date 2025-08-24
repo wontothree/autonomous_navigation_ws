@@ -19,24 +19,24 @@ MCLocalizer::MCLocalizer()
     // motion
     delta_x_ = delta_y_ = delta_distance_ = delta_yaw_ = 0.0;
     delta_x_sum_ = delta_y_sum_ = delta_distance_sum_ = delta_yaw_sum_ = 0.0; // 나중에 언젠간 쓰겠지??
-    is_omnidirectional_model = true;
     odom_differential_drive_model_noise_ = {1.0, 0.5, 0.5, 1.0}; // distance noise for distance^2, distance noise for yaw^2, yaw noise for distance^2, yaw noise for yaw^2
 
-
-    // step 1
     // degree to radian
     initial_pose_yaw_ *= M_PI / 180.0;
 
-    // set initial pose
+    // initialization
     mcl_estimated_pose_.set_pose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
     initial_noise_.set_pose(initial_noise_x_, initial_noise_y_, initial_noise_yaw_);
-    initialize_particle_set(mcl_estimated_pose_, initial_noise_);
+    initialize_particle_set(mcl_estimated_pose_, initial_noise_); // initialize pose_tracking_particle_set_
     // resetReliabilities();
 }
 
 /**
  * @brief Gaussian random sampling using initial pose (step 1)
+ * 
  * @modifies pose_tracking_particle_set_
+ * 
+ * @called callback_initial_pose
  */
 void MCLocalizer::initialize_particle_set(
     const Pose &initial_pose,
@@ -72,7 +72,7 @@ void MCLocalizer::initialize_particle_set(
 /**
  * @brief 1. updating delta sum vaiables
  * @brief 2. updating robot pose by differntial drive model
- * @brief 3. updating particles by diffential drive model
+ * @brief 3. updating particles by diffential drive model *****
  * @brief 4. updating reliabilities
  * 
  * @member particleNum_

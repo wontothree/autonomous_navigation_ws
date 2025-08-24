@@ -2,7 +2,18 @@
 
 ---
 
-# `mc_localizer.h` and `mc_localizer.cpp`
+# `mc_localizer_ros.hpp`
+
+|Function||||
+|---|---|---|---|
+|callback_initial_pose|mcl_estimated_pose_를 업데이트하고, 함수 initialize_particle_set를 호출한다. (step 1)|||
+|callback_scan||||
+|callback_odom|delta_x_, delta_y_, delta_distance_, delta_yaw_를 업데이트한다.|||
+|callback_timer||||
+|||||
+---
+
+# `mc_localizer.hpp`
 
 ## Member Variables
 
@@ -13,10 +24,10 @@
 ||int|`pose_tracking_particle_num_`||
 ||int|`global_localization_particle_num_`||
 |||||
+||mcl_estimated_pose_|||
+||odom_pose_|||
 
 ## Functions
-
-Logic
 
 |Return|Function|Input|Description|사용하는 Member Variables|
 |---|---|---|---|---|

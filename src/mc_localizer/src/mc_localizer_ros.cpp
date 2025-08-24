@@ -33,6 +33,7 @@ MCLocalizerROS::MCLocalizerROS() : Node("mc_localizer_node")
     
     // publisher
     particle_set_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("particle_set", 10);
+    pose_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("pose", 10);
 
     // timer callback (main execute)
     timer_ = this->create_wall_timer(
@@ -46,12 +47,17 @@ MCLocalizerROS::MCLocalizerROS() : Node("mc_localizer_node")
 
 void MCLocalizerROS::callback_timer()
 {
-    publish_particle_set(mclocalizer_object_.pose_tracking_particle_set_);
+    // step 2
+    mclocalizer_object_.update_particles_by_motion_model();
+
+    publish_particle_set(mclocalizer_object_.particle_set_);
+
+    publish_pose(mclocalizer_object_.mcl_estimated_pose_);
 }
 
 /**
  * @modifies mclocalizer_object_.mcl_estimated_pose_
- * @modefies pose_tracking_particle_set_ indirectly by function initialize_particle_set
+ * @modefies particle_set_ indirectly by function initialize_particle_set
  * 
  * @modifies is_initialized_
  */
@@ -79,6 +85,7 @@ void MCLocalizerROS::callback_initial_pose(
         yaw
     );
 
+    // step 1
     // random sampling particles to initialize particle set
     mclocalizer_object_.initialize_particle_set(mclocalizer_object_.mcl_estimated_pose_, mclocalizer_object_.initial_noise_);
 
@@ -161,6 +168,9 @@ void MCLocalizerROS::callback_odom(const nav_msgs::msg::Odometry::SharedPtr odom
     previous_time = current_time;
 }
 
+/**
+ * @brief visualize particle set in RViz
+ */
 void MCLocalizerROS::publish_particle_set(const std::vector<Particle>& particle_set)
 {
     visualization_msgs::msg::MarkerArray marker_array;
@@ -204,5 +214,55 @@ void MCLocalizerROS::publish_particle_set(const std::vector<Particle>& particle_
     // 퍼블리시
     particle_set_publisher_->publish(marker_array);
 }
+
+void MCLocalizerROS::publish_pose(const Pose& pose) {
+    visualization_msgs::msg::MarkerArray marker_array;
+
+    // --------------------------
+    // Arrow: visualize estimated pose
+    // --------------------------
+    visualization_msgs::msg::Marker arrow_marker;
+    std::string mapFrame_ = "odom";
+    arrow_marker.header.frame_id = mapFrame_;
+    arrow_marker.header.stamp = this->now();
+    arrow_marker.ns = "mcl_pose_arrow";
+    arrow_marker.id = 0;
+    arrow_marker.type = visualization_msgs::msg::Marker::ARROW;
+    arrow_marker.action = visualization_msgs::msg::Marker::ADD;
+
+    // Arrow 시작점과 끝점
+    geometry_msgs::msg::Point start, end;
+    start.x = pose.get_x();
+    start.y = pose.get_y();
+    start.z = 0.05;  // 살짝 띄워서 particles 위에 표시
+
+    double arrow_length = 0.5; // 화살표 길이
+    end.x = start.x + arrow_length * cos(pose.get_yaw());
+    end.y = start.y + arrow_length * sin(pose.get_yaw());
+    end.z = 0.05;
+
+    arrow_marker.points.push_back(start);
+    arrow_marker.points.push_back(end);
+
+    // 색상: 강렬한 빨간색
+    arrow_marker.color.r = 1.0;
+    arrow_marker.color.g = 0.0;
+    arrow_marker.color.b = 0.0;
+    arrow_marker.color.a = 1.0;
+
+    // 화살표 두께 및 머리
+    arrow_marker.scale.x = 0.05; // shaft diameter
+    arrow_marker.scale.y = 0.1;  // head diameter
+    arrow_marker.scale.z = 0.1;  // head length
+
+    arrow_marker.lifetime = rclcpp::Duration::from_seconds(0.2);
+
+    marker_array.markers.push_back(arrow_marker);
+
+    // 퍼블리시
+    pose_publisher_->publish(marker_array);
+}
+
+
 
 } // namespace mc_localizer

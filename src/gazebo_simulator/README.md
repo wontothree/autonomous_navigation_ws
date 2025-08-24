@@ -61,7 +61,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:
 - `/diffbot/odom`
 - `/diffbot/scan`
 - `/goal_pose`
-- `/initialpose`
+- [geometry_msgs/msg/PoseWithCovarianceStamped](https://docs.ros2.org/foxy/api/geometry_msgs/msg/PoseWithCovarianceStamped.html) (`/initialpose`)
 - `/joint_states`
 - `/performance_metrics`
 - `/robot_description`

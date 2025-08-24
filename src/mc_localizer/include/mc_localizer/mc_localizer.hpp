@@ -27,9 +27,8 @@ public:
     Pose base_link_to_laser_;
 
     // particles
-    int particle_num_;
-    std::vector<Particle> particles_; // tmp
-    std::vector<Particle> pose_tracking_particle_set_;
+    int particle_num_, global_localization_particle_num_;
+    std::vector<Particle> particle_set_, global_localization_particle_set_;
 
     // motion
     double delta_x_, delta_y_, delta_distance_, delta_yaw_;
@@ -77,8 +76,11 @@ public:
 
     // void calculate_likelihoods_from_global_localization(void);
 
-    // void estimate_robot_pose(void);
+    void estimate_robot_pose(void);
 
+    /**
+     * @modifies
+     */
     void resample_particles(void);
 
 private:

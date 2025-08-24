@@ -8,6 +8,7 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>            // tf2::toMsg
 
 #include <visualization_msgs/msg/marker_array.hpp>            // visualization_msgs::msg::MarkerArray
 
@@ -31,6 +32,7 @@ private:
 
     // publisher
     rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr particle_set_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pose_publisher_;
 
     // callback_timer
     const int timer_period_ = 10;             // timer period (ms)
@@ -62,6 +64,8 @@ private: // callback functions
 
 private: // visualization functions
     void publish_particle_set(const std::vector<Particle>& particle_set);
+
+    void publish_pose(const Pose& pose);
 };
 
 } // namespace mc_localizer

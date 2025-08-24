@@ -14,7 +14,9 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+
 
 # src 안에 있는 모든 실행 파일을 추가한다. -> 실행 파일을 만든다.
 add_executable(mc_localizer_node 
@@ -29,6 +31,7 @@ ament_target_dependencies(mc_localizer_node
   sensor_msgs
   nav_msgs
   tf2
+  tf2_geometry_msgs
   visualization_msgs
 )
 

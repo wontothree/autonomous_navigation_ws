@@ -1,4 +1,4 @@
-#include <mc_localizer/mc_localizer.hpp>
+#include "mc_localizer/mc_localizer.hpp"
 
 namespace mc_localizer {
 
@@ -15,6 +15,7 @@ MCLocalizer::MCLocalizer()
 
     // particles
     particle_num_ = 1000;
+    global_localization_particle_num_ = 100;
 
     // motion
     delta_x_ = delta_y_ = delta_distance_ = delta_yaw_ = 0.0;
@@ -27,14 +28,17 @@ MCLocalizer::MCLocalizer()
     // initialization
     mcl_estimated_pose_.set_pose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
     initial_noise_.set_pose(initial_noise_x_, initial_noise_y_, initial_noise_yaw_);
-    initialize_particle_set(mcl_estimated_pose_, initial_noise_); // initialize pose_tracking_particle_set_
+    initialize_particle_set(mcl_estimated_pose_, initial_noise_); // initialize particle_set_
     // resetReliabilities();
+
+    // 임시
+    global_localization_particle_set_.resize(global_localization_particle_num_);
 }
 
 /**
  * @brief Gaussian random sampling using initial pose (step 1)
  * 
- * @modifies pose_tracking_particle_set_
+ * @modifies particle_set_
  * 
  * @called callback_initial_pose
  */
@@ -44,7 +48,7 @@ void MCLocalizer::initialize_particle_set(
 )
 {
     // set up size of particle set
-    pose_tracking_particle_set_.resize(particle_num_);
+    particle_set_.resize(particle_num_);
 
     // extract mean pose and standard deviation
     double mean_x = initial_pose.get_x();
@@ -64,8 +68,8 @@ void MCLocalizer::initialize_particle_set(
         double yaw = mean_yaw + nrand(standard_deviation_yaw);
 
         // store particle samples
-        pose_tracking_particle_set_[i].set_pose(x, y, yaw);
-        pose_tracking_particle_set_[i].set_weight(weight);
+        particle_set_[i].set_pose(x, y, yaw);
+        particle_set_[i].set_weight(weight);
     }
 }
 
@@ -84,7 +88,7 @@ void MCLocalizer::initialize_particle_set(
  * @modifies deltaXSum_, deltaYSum_, deltaDistSum_, deltaYawSum_
  * 
  * @modifies mcl_estimated_pose_
- * @modifies pose_tracking_particle_set_
+ * @modifies particle_set_
  * @modifies reliabilities_
  */
 void MCLocalizer::update_particles_by_motion_model(void)
@@ -123,14 +127,14 @@ void MCLocalizer::update_particles_by_motion_model(void)
     for (int i = 0; i < particle_num_; ++i) {
         double ddist = delta_distance + nrand(distance_noise_variance);
         double dyaw = delta_yaw + nrand(yaw_noise_variance);
-        double yaw = pose_tracking_particle_set_[i].get_yaw();
+        double yaw = particle_set_[i].get_yaw();
         double t = yaw + dyaw / 2.0;
-        double x = pose_tracking_particle_set_[i].get_x() + ddist * cos(t);
-        double y = pose_tracking_particle_set_[i].get_y() + ddist * sin(t);
+        double x = particle_set_[i].get_x() + ddist * cos(t);
+        double y = particle_set_[i].get_y() + ddist * sin(t);
         yaw += dyaw;
 
         // update poarticle set
-        pose_tracking_particle_set_[i].set_pose(x, y, yaw);
+        particle_set_[i].set_pose(x, y, yaw);
 
         // estimate reliability
     }
@@ -227,7 +231,7 @@ void MCLocalizer::update_particles_by_motion_model(void)
 //     int max_likelihood_particle_index;
 //     for (int i = 0; i < particle_num_; ++i) {
 //         Pose particle_pose = particles_[i].get_pose();
-//         double measurement_likelihood = particle_[i].getW();
+//         double measurement_likelihood = particle_set_[i].getW();
 //         std::vector<double> residual_errors = getResidualErrors<double>(particle_pose);
 //         double decision_likelihood;
 //         if (1) { // check
@@ -260,60 +264,113 @@ void MCLocalizer::update_particles_by_motion_model(void)
 //     //
 // }
 
-// /**
-//  * @member pose_tracking_particle_set_, global_localization_particle_set_
-//  * @member pose_tracking_particle_num_, global_localization_particle_num_
-//  * @member is_global_localization_sampling_enabled, can_use_global_localization_sample
-//  * 
-//  * @modifies mcl_estimated_pose_
-//  */
-// void MCLocalizer::estimate_robot_pose(void)
-// {
-//     // if (scanMightInvalid_)
-//     //     return;
+/*
+    static FILE *fp;
+    if (fp == NULL && writePose_) {
+        fp = fopen(poseLogFile_.c_str(), "w");
+        if (fp == NULL) {
+            fprintf(stderr, "Cannot open a pose log file -> %s\\n", poseLogFile_.c_str());
+            writePose_ = false;
+        }
+    }
 
-//     double temp_yaw = mcl_estimated_pose_.get_yaw();
-//     double x = 0.0, y = 0.0, yaw = 0.0;
-//     double sum = 0.0;
-//     for (int i = 0; i < pose_tracking_particle_num_; ++i) {
-//         double weight = pose_tracking_particle_set_[i].get_weight();
-//         x += pose_tracking_particle_set_[i].get_x() * weight;
-//         y += pose_tracking_particle_set_[i].get_y() * weight;
-        
-//         double dyaw = temp_yaw - pose_tracking_particle_set_[i].get_yaw();
+    if (scanMightInvalid_)
+        return;
 
-//         while (dyaw < - M_PI)
-//             dyaw += 2.0 * M_PI;
-//         while (dyaw > M_PI)
-//             dyaw -= 2.0 * M_PI;
+    double tmpYaw = mclPose_.getYaw();
+    double x = 0.0, y = 0.0, yaw = 0.0;
+    double sum = 0.0;
+    
+    for (int i = 0; i < particlesNum_; ++i) {
+        double w = particles_[i].getW();
+        x += particles_[i].getX() * w;
+        y += particles_[i].getY() * w;
+        double dyaw = tmpYaw - particles_[i].getYaw();
+        while (dyaw < -M_PI)
+            dyaw += 2.0 * M_PI;
+        while (dyaw > M_PI)
+            dyaw -= 2.0 * M_PI;
+        yaw += dyaw * w;
+        sum += w;
+    }
 
-//         yaw += dyaw * weight;
-//         sum += weight;
-//     }
+    if (useGLPoseSampler_ && canUseGLSampledPoses_) {
+        double x2 = x, y2 = y, yaw2 = yaw;
+        for (int i = 0; i < glParticlesNum_; ++i) {
+            double w = glParticles_[i].getW();
+            x += glParticles_[i].getX() * w;
+            y += glParticles_[i].getY() * w;
+            double dyaw = tmpYaw - glParticles_[i].getYaw();
+            while (dyaw < -M_PI)
+                dyaw += 2.0 * M_PI;
+            while (dyaw > M_PI)
+                dyaw -= 2.0 * M_PI;
+            yaw += dyaw * w;
+            sum += w;
+        }
+        if (sum > 1.0)
+            x = x2, y = y2, yaw = yaw2;
+    }
 
-//     if (is_global_localization_sampling_enabled && can_use_global_localization_sample) {
-//         double x2 = x, y2 = y, yaw2 = yaw;
-//         for (int i = 0; i < global_localization_particle_num_; ++i) {
-//             double weight = global_localization_particle_set_[i].getWeight();
-//             x += global_localization_particle_set_[i].get_x() * weight;
-//             y += global_localization_particle_set_[i].get_y() * weight;
+    yaw = tmpYaw - yaw;
+    mclPose_.setPose(x, y, yaw);
 
-//             double dyaw = temp_yaw - global_localization_particle_set_[i].getYaw();
-//             while (dyaw < -M_PI)
-//                 dyaw += 2.0 * M_PI;
-//             while (dyaw > M_PI)
-//                 dyaw -= 2.0 * M_PI;
+    if (writePose_)
+        fprintf(fp, "%lf %lf %lf %lf\\n", mclPoseStamp_.toSec(), x, y, yaw);
+*/
 
-//             yaw += dyaw * weight;
-//             sum += weight;
-//         }
-//         if (sum > 1.0)
-//             x = x2, y = y2, yaw = yaw2;
-//     }
+/**
+ * @member particle_set_, global_localization_particle_set_
+ * @member particle_num_, global_localization_particle_num_
+ * @member is_global_localization_sampling_enabled, can_use_global_localization_sample
+ * 
+ * @modifies mcl_estimated_pose_
+ */
+void MCLocalizer::estimate_robot_pose(void)
+{
+    // if (scanMightInvalid_)
+    //     return;
 
-//     yaw = temp_yaw - yaw;
-//     mcl_estimated_pose_.set_pose(x, y, yaw);
-// }
+    double reference_yaw = mcl_estimated_pose_.get_yaw();
+    double estimated_x = 0.0, estimated_y = 0.0, estimated_yaw = 0.0;
+    double weight_sum = 0.0;
+    for (int i = 0; i < particle_num_; ++i) {
+        double weight = particle_set_[i].get_weight();
+        estimated_x += particle_set_[i].get_x() * weight; // weighted sum for x in pose tracking particle set
+        estimated_y += particle_set_[i].get_y() * weight; // weighted sum for y in pose tracking particle set
+
+        double dyaw = reference_yaw - particle_set_[i].get_yaw();
+        while (dyaw < - M_PI) dyaw += 2.0 * M_PI;         
+        while (dyaw > M_PI) dyaw -= 2.0 * M_PI;           
+        estimated_yaw += dyaw * weight;                   // weighted sum for yaw in pose tracking particle set
+
+        weight_sum += weight;
+    }
+
+    // if (is_global_localization_sampling_enabled && can_use_global_localization_sample) {
+    //     double x2 = estimated_x, y2 = estimated_y, yaw2 = estimated_yaw;
+    //     for (int i = 0; i < global_localization_particle_num_; ++i) {
+    //         double weight = global_localization_particle_set_[i].get_weight();
+    //         estimated_x += global_localization_particle_set_[i].get_x() * weight;
+    //         estimated_y += global_localization_particle_set_[i].get_y() * weight;
+
+    //         double dyaw = reference_yaw - global_localization_particle_set_[i].get_yaw();
+    //         while (dyaw < -M_PI) dyaw += 2.0 * M_PI;
+    //         while (dyaw > M_PI) dyaw -= 2.0 * M_PI;
+    //         estimated_yaw += dyaw * weight;
+
+    //         weight_sum += weight;
+    //     }
+
+    //     // prevent sum of weights is over 1
+    //     if (weight_sum > 1.0) estimated_x = x2, estimated_y = y2, estimated_yaw = yaw2;
+    // }
+
+    estimated_yaw = reference_yaw - estimated_yaw;
+
+    // update mcl_estimated_pose_
+    mcl_estimated_pose_.set_pose(estimated_x, estimated_y, estimated_yaw);
+}
 
 void MCLocalizer::resample_particles(void)
 {

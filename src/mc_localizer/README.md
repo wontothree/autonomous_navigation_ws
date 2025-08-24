@@ -19,6 +19,12 @@ Monte Carlo Localization Module
     ├── CMakeLists.txt                             
     └── package.xml    
 
+# 🚀 Quick Start
+
+```bash
+ros2 run mc_localizer mc_localizer_node
+```
+
 # 💬 Subscribed Topics
 
 Following messages (topics) are needed to be published;

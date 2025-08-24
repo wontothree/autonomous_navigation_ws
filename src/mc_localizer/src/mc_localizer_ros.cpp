@@ -34,18 +34,16 @@ MCLocalizerROS::MCLocalizerROS() : Node("mc_localizer_node")
     // publisher
     particle_set_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("particle_set", 10);
 
-
     // timer callback (main execute)
     timer_ = this->create_wall_timer(
         std::chrono::milliseconds(timer_period_),
         [this]() { this->callback_timer(); }
     );
-
 }
 
 void MCLocalizerROS::callback_timer()
 {
-    //
+    publish_particle_set(mclocalizer_object_.pose_tracking_particle_set_);
 }
 
 void MCLocalizerROS::callback_initial_pose(
@@ -93,7 +91,7 @@ void MCLocalizerROS::callback_scan(const sensor_msgs::msg::LaserScan::SharedPtr 
 
 void MCLocalizerROS::callback_odom(const nav_msgs::msg::Odometry::SharedPtr odom)
 {
-    std::cout << "odom callback" << std::endl;
+    // std::cout << "odom callback" << std::endl;
 }
 
 void MCLocalizerROS::publish_particle_set(const std::vector<Particle>& particle_set)
@@ -103,6 +101,7 @@ void MCLocalizerROS::publish_particle_set(const std::vector<Particle>& particle_
     for (size_t i = 0; i < particle_set.size(); ++i) {
         visualization_msgs::msg::Marker marker;
         // marker.header.frame_id = map_frame_id_;  // RViz에서 사용하는 fixed frame
+        marker.header.frame_id = "odom"; 
         marker.header.stamp = this->now();       
         marker.ns = "particles";
         marker.id = i;

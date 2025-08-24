@@ -9,20 +9,18 @@ MCLocalizer::MCLocalizer()
     initial_pose_x_ = 0;
     initial_pose_y_ = 0;
     initial_pose_yaw_ = 0;
-    initial_pose_noise_x_ = 0.02;
-    initial_pose_noise_y_ = 0.02;
-    initial_pose_noise_yaw_ = 0.02;
+    initial_noise_x_ = 0.02;
+    initial_noise_y_ = 0.02;
+    initial_noise_yaw_ = 0.02;
 
     // particles
     particle_num_ = 1000;
 
     // motion
-    delta_x_ = 0.0;
-    delta_y_ = 0.0;
-    delta_distance_ = 0.0;
-    delta_yaw_ = 0.0;
+    delta_x_ = delta_y_ = delta_distance_ = delta_yaw_ = 0.0;
+    delta_x_sum_ = delta_y_sum_ = delta_distance_sum_ = delta_yaw_sum_ = 0.0; // 나중에 언젠간 쓰겠지??
     is_omnidirectional_model = true;
-    odom_noise_odm_ = {1.0, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0};
+    odom_differential_drive_model_noise_ = {1.0, 0.5, 0.5, 1.0}; // distance noise for distance^2, distance noise for yaw^2, yaw noise for distance^2, yaw noise for yaw^2
 
 
     // step 1
@@ -31,30 +29,30 @@ MCLocalizer::MCLocalizer()
 
     // set initial pose
     mcl_estimated_pose_.set_pose(initial_pose_x_, initial_pose_y_, initial_pose_yaw_);
-    initial_pose_noise_.set_pose(initial_pose_noise_x_, initial_pose_noise_y_, initial_pose_noise_yaw_);
-    sample_particles(mcl_estimated_pose_, initial_pose_noise_);
+    initial_noise_.set_pose(initial_noise_x_, initial_noise_y_, initial_noise_yaw_);
+    initialize_particle_set(mcl_estimated_pose_, initial_noise_);
     // resetReliabilities();
 }
 
 /**
  * @brief Gaussian random sampling using initial pose (step 1)
- * @member pose_tracking_particle_set_
+ * @modifies pose_tracking_particle_set_
  */
-void MCLocalizer::sample_particles(
-    const Pose &mean_pose,
-    const Pose &standard_deviation_pose 
+void MCLocalizer::initialize_particle_set(
+    const Pose &initial_pose,
+    const Pose &initial_noise 
 )
 {
     // set up size of particle set
     pose_tracking_particle_set_.resize(particle_num_);
 
     // extract mean pose and standard deviation
-    double mean_x = mean_pose.get_x();
-    double mean_y = mean_pose.get_y();
-    double mean_yaw = mean_pose.get_yaw();
-    double standard_deviation_x = standard_deviation_pose.get_x();
-    double standard_deviation_y = standard_deviation_pose.get_y();
-    double standard_deviation_yaw = standard_deviation_pose.get_yaw();
+    double mean_x = initial_pose.get_x();
+    double mean_y = initial_pose.get_y();
+    double mean_yaw = initial_pose.get_yaw();
+    double standard_deviation_x = initial_noise.get_x();
+    double standard_deviation_y = initial_noise.get_y();
+    double standard_deviation_yaw = initial_noise.get_yaw();
 
     // set same weight (guarantee int)
     double weight = 1.0 / static_cast<double>(particle_num_);
@@ -71,73 +69,72 @@ void MCLocalizer::sample_particles(
     }
 }
 
-// /**
-//  * @member 
-//  * @modifies
-//  */
-// void MCLocalizer::update_particles_by_motion_model(void)
-// {
-//     // delare and initialize local variables
-//     double delta_x = delta_x_;
-//     double delta_y = delta_y_;
-//     double delta_distance = delta_x_;
-//     double delta_yaw = delta_x_;
+/**
+ * @brief 1. updating delta sum vaiables
+ * @brief 2. updating robot pose by differntial drive model
+ * @brief 3. updating particles by diffential drive model
+ * @brief 4. updating reliabilities
+ * 
+ * @member particleNum_
+ * @member useOmniDirectionalModel_, odomNoiseDDM_[], odomNoiseODM_[]
+ * @member estimateReliability_
+ * 
+ * 
+ * @modifies deltaX_, deltaY_, deltaDist_, deltaYaw_
+ * @modifies deltaXSum_, deltaYSum_, deltaDistSum_, deltaYawSum_
+ * 
+ * @modifies mcl_estimated_pose_
+ * @modifies pose_tracking_particle_set_
+ * @modifies reliabilities_
+ */
+void MCLocalizer::update_particles_by_motion_model(void)
+{
+    // delare and initialize local variables
+    double delta_x = delta_x_;
+    double delta_y = delta_y_;
+    double delta_distance = delta_distance_;
+    double delta_yaw = delta_yaw_;
 
-//     // initalize member variables
-//     delta_x_ = 0;
-//     delta_y_ = 0;
-//     delta_distance_ = 0;
-//     delta_yaw_ = 0;
+    // initalize member variables
+    delta_x_ = 0;
+    delta_y_ = 0;
+    delta_distance_ = 0;
+    delta_yaw_ = 0;
 
-//     // update member variables
-//     delta_x_sum_ += fabs(delta_x);
-//     delta_y_sum_ += fabs(delta_y);
-//     delta_distance_sum_ += fabs(delta_distance);
-//     delta_yaw_sum_ += fabs(delta_yaw);
+    // update member variables
+    delta_x_sum_ += fabs(delta_x);
+    delta_y_sum_ += fabs(delta_y);
+    delta_distance_sum_ += fabs(delta_distance);
+    delta_yaw_sum_ += fabs(delta_yaw);
 
-//     if (!is_omnidirectional_model)
-//     {
-//         //
-//     }
-//     else
-//     {  // omnidirectional model
-//         double yaw = mcl_estimated_pose_.get_yaw();
-//         double t = yaw + delta_yaw / 2.0;
-//         double x = mcl_estimated_pose_.get_x() + delta_x * cos(t) + delta_y * cos(t + M_PI / 2.0f);
-//         double y = mcl_estimated_pose_.get_y() + delta_x * sin(t) + delta_y * sin(t + M_PI / 2.0f);;
-//         yaw += delta_yaw;
-//         mcl_estimated_pose_.set_pose(x, y, yaw);
+    // update pose by differential drive model
+    double yaw = mcl_estimated_pose_.get_yaw();
+    double t = yaw + delta_yaw / 2.0;                                  // midpoint approximation in differntial drive model
+    double x = mcl_estimated_pose_.get_x() + delta_distance * cos(t);
+    double y = mcl_estimated_pose_.get_y() + delta_distance * sin(t);
+    yaw += delta_yaw;
+    mcl_estimated_pose_.set_pose(x, y, yaw);
 
-//         double square_x = delta_x * delta_x;
-//         double square_y = delta_y * delta_y;
-//         double square_yaw = delta_yaw * delta_yaw;
-//         double xRandVal = square_x * odom_noise_odm_[0] + square_y * odom_noise_odm_[1] + square_yaw * odom_noise_odm_[2];
-//         double yRandVal = square_x * odom_noise_odm_[3] + square_y * odom_noise_odm_[4] + square_yaw * odom_noise_odm_[5];
-//         double yawRandVal = square_x * odom_noise_odm_[6] + square_y * odom_noise_odm_[7] + square_yaw * odom_noise_odm_[8];
+    // update particles by differential drive model
+    double squared_delta_distance = delta_distance * delta_distance;
+    double squared_delta_yaw = delta_yaw * delta_yaw;
+    double distance_noise_variance = squared_delta_distance * odom_differential_drive_model_noise_[0] + squared_delta_yaw * odom_differential_drive_model_noise_[1];
+    double yaw_noise_variance = squared_delta_distance * odom_differential_drive_model_noise_[2] + squared_delta_yaw * odom_differential_drive_model_noise_[3];
+    for (int i = 0; i < particle_num_; ++i) {
+        double ddist = delta_distance + nrand(distance_noise_variance);
+        double dyaw = delta_yaw + nrand(yaw_noise_variance);
+        double yaw = pose_tracking_particle_set_[i].get_yaw();
+        double t = yaw + dyaw / 2.0;
+        double x = pose_tracking_particle_set_[i].get_x() + ddist * cos(t);
+        double y = pose_tracking_particle_set_[i].get_y() + ddist * sin(t);
+        yaw += dyaw;
 
-//         for (int i = 0; i < particle_num_; ++i) {
-//             double dx = delta_x + nrand(xRandVal);
-//             double dy = delta_y + nrand(yRandVal);
-//             double dyaw = delta_yaw + nrand(yawRandVal);
+        // update poarticle set
+        pose_tracking_particle_set_[i].set_pose(x, y, yaw);
 
-//             double yaw = pose_tracking_particle_set_[i].get_yaw();
-//             double t = yaw + dyaw / 2.0;
-//             double x = pose_tracking_particle_set_[i].get_x() + dx * cos(t) + dy * cos(t + M_PI / 2.0f);
-//             double y = pose_tracking_particle_set_[i].get_y() + dx * sin(t) + dy * sin(t + M_PI / 2.0f);;
-//             yaw += dyaw;
-//             pose_tracking_particle_set_[i].set_pose(x, y, yaw);
-
-//             // reliability transition model
-
-//             // if (estimateReliability_) {
-//             //     double decayRate = 1.0 - (relTransODM_[0] * dx * dx + relTransODM_[1] * dy * dy + relTransODM_[2] * dyaw * dyaw);
-//             //     if (decayRate <= 0.0)
-//             //         decayRate = 10.0e-6;
-//             //     reliabilities_[i] *= decayRate;
-//             // }
-//         }
-//     }
-// }
+        // estimate reliability
+    }
+}
 
 // void MCLocalizer::calculate_likelihoods_by_measurement_model(void)
 // {

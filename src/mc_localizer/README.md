@@ -14,7 +14,7 @@ Monte Carlo Localization Module
     ├── launch/                            
     ├── src/     
     │   ├── mc_localizer_node.cpp                      # entry point
-    │   ├── mc_localizer_ros.cpp                       # 
+    │   ├── mc_localizer_ros.cpp                       # ros code (subscribers, publishers, callback and visualization functions)
     │   └── mc_localizer.cpp                           # 
     ├── CMakeLists.txt                             
     └── package.xml    
@@ -23,9 +23,9 @@ Monte Carlo Localization Module
 
 Following messages (topics) are needed to be published;
 
-- sensor_msgs/msg/LaserScan (`/scan`)
-- nav_msgs/msg/Odometry (`/odom`)
-- nav_msgs/msg/OccupancyGrid (`/map`)
+- [sensor_msgs/msg/LaserScan](https://docs.ros2.org/foxy/api/sensor_msgs/msg/LaserScan.html) (`/scan`) 
+- [nav_msgs/msg/Odometry](https://docs.ros2.org/foxy/api/nav_msgs/msg/Odometry.html) (`/odom`)
+- [nav_msgs/msg/OccupancyGrid](https://docs.ros2.org/foxy/api/nav_msgs/msg/OccupancyGrid.html) (`/map`)
 
 Also, static transformation between following two frames is needed to be set.
 
@@ -34,46 +34,6 @@ Also, static transformation between following two frames is needed to be set.
 
 # Published Topics
 
-# `mc_localizer.h` and `mc_localizer.cpp`
+# Nodes
 
-## Member Variables
-
-|Index|Type|Variable|Description|
-|---|---|---|---|
-||`std::vector<Particle>`|`pose_tracking_particle_set_`||
-||`std::vector<Particle>`|`global_localization_particle_set_`||
-||int|`pose_tracking_particle_num_`||
-||int|`global_localization_particle_num_`||
-|||||
-
-## Functions
-
-Logic
-
-|Return|Function|Input|Description|사용하는 Member Variables|
-|---|---|---|---|---|
-||sample_particles||||
-||update_particles_by_motion_model||omnidirectional model을 사용하여 `pose_tracking_particle_set_` 업데이트|||
-||calculate_likelihoods_by_measurement_model||||
-||calculate_likelihoods_by_decision_model||||
-||calculate_likelihoods_from_global_localization||||
-||estimate_robot_pose||||
-||resample_particles||||
-
-# `mc_localizer_ros.hpp`
-
-## Member Variables
-
-|Index|Type|Variable|Initialization|Description|
-|---|---|---|---|---|
-||std::string|scan_topic_name_|||
-||std::string|odom_topic_name_|||
-
-## Functions
-
-|Return|Function|Input|Description|사용하는 Member Variables|
-|---|---|---|---|---|
-||callback_timer||||
-||callback_scan||||
-||callback_odom||||
-||callback_initial_pose||||
+`mc_localizer_node`

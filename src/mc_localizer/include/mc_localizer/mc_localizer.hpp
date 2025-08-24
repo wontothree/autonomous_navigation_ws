@@ -20,9 +20,9 @@ public:
 public:
     // pose
     double initial_pose_x_, initial_pose_y_, initial_pose_yaw_;
-    double initial_pose_noise_x_, initial_pose_noise_y_, initial_pose_noise_yaw_;
+    double initial_noise_x_, initial_noise_y_, initial_noise_yaw_;
     Pose mcl_estimated_pose_;  // current estimated pose & finally estimated pose
-    Pose initial_pose_noise_;  // noise for initial sampling
+    Pose initial_noise_;  // noise for initial sampling
     Pose base_link_to_laser_;
 
     // particles
@@ -40,7 +40,7 @@ private:
     double delta_x_, delta_y_, delta_distance_, delta_yaw_;
     double delta_x_sum_, delta_y_sum_, delta_distance_sum_, delta_yaw_sum_, delta_time_sume_;
     bool is_omnidirectional_model;
-    std::vector<double> odom_noise_odm_;
+    std::vector<double> odom_differential_drive_model_noise_; // distance noise for distance^2, distance noise for yaw^2, yaw noise for distance^2, yaw noise for yaw^2
 
     // measurements
     std::vector<bool> likelihoodShiftedSteps_;
@@ -65,9 +65,9 @@ private:
     bool can_use_global_localization_sample = false;
 
 public:
-    void sample_particles(const Pose &mean_pose, const Pose &noise_stddev);
+    void initialize_particle_set(const Pose &initial_pose, const Pose &initial_noise);
 
-    // void update_particles_by_motion_model(void);
+    void update_particles_by_motion_model(void);
 
     // void calculate_likelihoods_by_measurement_model(void);
 
